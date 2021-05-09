@@ -1,0 +1,92 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter11_Play_YAML.ppm
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 600
+  field-of-view: 1.047
+  from: [0, 1.5, -5]
+  to: [0, 1, 0]
+  up: [0, 1, 0]
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-5, 3, -10]
+  intensity: [1, 1, 1]
+
+# ======================================================
+# define some constants to avoid duplication
+# ======================================================
+
+- define: base-material
+  value:
+    color: [ 0.05, 0.05, 0.1 ]
+    diffuse: 0.1
+    shininess: 300
+    reflective: 1
+    transparency: 1
+    refractive-index: 1
+
+- define: glass-material
+  extend: base-material
+  value:
+    refractive-index: 1.52
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  material:
+    pattern:
+      type: checker
+      colors:
+        - [1, 0.3, 0.7]
+        - [0.3, 1, 0.7]
+    specular: 0
+
+# the sky
+- add: plane
+  transform:
+    - [translate, 0, 5, 0]
+  material:
+    pattern:
+      type: double-gradient
+      colors:
+        - [0.8, 0.8, 1]
+        - [0.1, 0.1, 1]
+      transform:
+        - [ scale, 100000, 100000, 100000 ]
+    ambient: 0.9
+    specular: 0
+
+# glass sphere
+- add: sphere
+  transform:
+    - [ translate, 1.5, 1, 0 ]
+  material: glass-material
+
+# hollow sphere
+- add: sphere
+  transform:
+    - [ translate, 1.5, 1, 0 ]
+    - [ scale, 0.5, 0.5, 0.5 ]
+  material: base-material
+
+# mirrored sphere
+- add: sphere
+  transform:
+    - [ translate, -1.5, 1, 0 ]
+  material: glass-material
+    transparency: 0

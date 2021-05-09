@@ -1,0 +1,69 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter11_Fresnel_YAML.ppm
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 1000
+  field-of-view: 1.047
+  from: [0, 2.5, 0]
+  to: [0, 0, 0]
+  up: [0, 0, 1]
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [0, 10, 20]
+  intensity: [1, 1, 1]
+
+# ======================================================
+# define some constants to avoid duplication
+# ======================================================
+
+- define: base-material
+  value:
+    color: [ 0.05, 0.05, 0.1 ]
+    diffuse: 0.1
+    shininess: 300
+    reflective: 1
+    transparency: 1
+    refractive-index: 1
+
+- define: glass-material
+  extend: base-material
+  value:
+    refractive-index: 1.52
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  transform:
+    - [translate, 0, -5.1, 0]
+  material:
+    pattern:
+      type: checker
+      colors:
+        - [0, 0, 0]
+        - [1, 1, 1]
+    ambient: 0.9
+
+# glass sphere
+- add: sphere
+  material: glass-material
+
+# hollow sphere
+- add: sphere
+  transform:
+    - [ scale, 0.5, 0.5, 0.5 ]
+  material: base-material

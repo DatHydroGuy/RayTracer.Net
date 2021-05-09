@@ -1,0 +1,98 @@
+# ======================================================
+# Chapter07.yml
+#
+# This file reconstructs the final image of Chapter07
+# from the book "The Ray Tracer Challenge" by Jamis Buck
+# ======================================================
+
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter09_YAML.ppm
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 500
+  field-of-view: 1.047
+  from: [0, 1.5, -5]
+  to: [0, 1, 0]
+  up: [0, 1, 0]
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-10, 10, -10]
+  intensity: [1, 1, 1]
+
+- add: light
+  at: [10, 10, -10]
+  intensity: [0.5, 0.5, 1]
+
+# ======================================================
+# define some constants to avoid duplication
+# ======================================================
+
+- define: floor-material
+  value:
+    color: [ 1, 0.9, 0.9 ]
+    specular: 0.0
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  material: floor-material
+
+# left wall
+- add: plane
+  transform:
+    - [ rotatex, 1.571 ]
+    - [ rotatey, -0.785 ]
+    - [ translate, 0, 0, 5 ]
+  material: floor-material
+
+# right wall
+- add: plane
+  transform:
+    - [ rotatex, 1.571 ]
+    - [ rotatey, 0.785 ]
+    - [ translate, 0, 0, 5 ]
+  material: floor-material
+
+# middle sphere
+- add: sphere
+  transform:
+    - [ translate, -0.5, 1, 0.5 ]
+  material:
+    color: [ 0.1, 1, 0.5 ]
+    diffuse: 0.7
+    specular: 0.3
+
+# right sphere
+- add: sphere
+  transform:
+    - [ scale, 0.5, 0.5, 0.5 ]
+    - [ translate, 1.5, 0.5, -0.5 ]
+  material:
+    color: [ 0.5, 1, 0.1 ]
+    diffuse: 0.7
+    specular: 0.3
+
+# left sphere
+- add: sphere
+  transform:
+    - [ scale, 0.33, 0.33, 0.33 ]
+    - [ translate, -1.5, 0.33, -0.75 ]
+  material:
+    color: [ 1, 0.8, 0.1 ]
+    diffuse: 0.7
+    specular: 0.3

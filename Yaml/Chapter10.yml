@@ -1,0 +1,141 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter10_YAML.ppm
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 500
+  field-of-view: 1.047
+  from: [0, 1.5, -5]
+  to: [0, 1, 0]
+  up: [0, 1, 0]
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-10, 10, -10]
+  intensity: [0.5, 0.5, 0]
+
+- add: light
+  at: [0, 10, -10]
+  intensity: [0, 0.5, 0.5]
+
+- add: light
+  at: [10, 10, -10]
+  intensity: [0.5, 0, 0.5]
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  material:
+    pattern:
+      type: stripe
+      colors:
+        - [1, 1, 0]
+        - [0, 0, 1]
+      transform:
+        - [scale, 0.5, 0.5, 0.5]
+        - [rotate-y, 0.3]
+    specular: 0
+
+# left wall
+- add: plane
+  transform:
+    - [ rotatex, 1.571 ]
+    - [ rotatey, -0.785 ]
+    - [ translate, 0, 0, 5 ]
+  material:
+    pattern:
+      type: ring
+      colors:
+        - [0, 1, 0]
+        - [1, 0.5, 0]
+      transform:
+        - [scale, 0.5, 0.5, 0.5]
+    specular: 0
+
+# right wall
+- add: plane
+  transform:
+    - [ rotatex, 1.571 ]
+    - [ rotatey, 0.785 ]
+    - [ translate, 0, 0, 5 ]
+  material:
+    pattern:
+      type: checker
+      colors:
+        - [1, 0, 0]
+        - [0, 1, 1]
+      transform:
+        - [scale, 0.75, 0.5, 0.5]
+        - [rotate-y, 0.3]
+    specular: 0
+
+# middle sphere
+- add: sphere
+  transform:
+    - [ rotatez, 1.047 ]
+    - [ rotatex, -2.094 ]
+    - [ translate, -0.5, 1, 0.5 ]
+  material:
+    color: [ 0.1, 1, 0.5 ]
+    diffuse: 0.7
+    specular: 0.3
+    pattern:
+      type: gradient
+      colors:
+        - [1, 0, 0]
+        - [0, 1, 1]
+      transform:
+        - [ rotatex, 1.047 ]
+        - [ scale, 2, 2, 2 ]
+        - [ translate, -1, 0, 0 ]
+
+# right sphere
+- add: sphere
+  transform:
+    - [ rotatez, -0.785 ]
+    - [ rotatex, 2.094 ]
+    - [ scale, 0.5, 0.5, 0.5 ]
+    - [ translate, 1.5, 0.5, -0.5 ]
+  material:
+    color: [ 0.5, 1, 0.1 ]
+    diffuse: 0.7
+    specular: 0.3
+    pattern:
+      type: stripe
+      colors:
+        - [1, 1, 0]
+        - [0.4, 0, 1]
+      transform:
+        - [ scale, 0.1, 0.1, 0.1 ]
+
+# left sphere
+- add: sphere
+  transform:
+    - [ rotatez, 0.785 ]
+    - [ rotatex, 1.047 ]
+    - [ scale, 0.33, 0.33, 0.33 ]
+    - [ translate, -1.5, 0.33, -0.75 ]
+  material:
+    color: [ 1, 0.8, 0.1 ]
+    diffuse: 0.7
+    specular: 0.3
+    pattern:
+      type: checker
+      colors:
+        - [1, 0.8, 0.8]
+        - [0.2, 0.2, 0.4]
+      transform:
+        - [ scale, 0.25, 0.5, 0.75 ]
