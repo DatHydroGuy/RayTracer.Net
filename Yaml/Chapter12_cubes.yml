@@ -2,7 +2,7 @@
 # output filename
 # ======================================================
 
-- file: Images\Chapter11_Play_YAML2.ppm
+- file: Images\Chapter12_cubes_YAML2.ppm
 
 # ======================================================
 # the camera
@@ -12,9 +12,11 @@
   width: 1000
   height: 600
   field-of-view: 1.047
-  from: [0, 1.5, -5]
+  from: [0, 1.5, -6]
   to: [0, 1, 0]
   up: [0, 1, 0]
+  reflection-depth: 8
+  show-progress: true
 
 # ======================================================
 # the light
@@ -30,7 +32,7 @@
 
 - define: base-material
   value:
-    color: [ 0.05, 0.05, 0.1 ]
+    color: [ 0.05, 0.05, 0.05 ]
     diffuse: 0.1
     shininess: 300
     reflective: 1
@@ -40,12 +42,14 @@
 - define: glass-material
   extend: base-material
   value:
+    color: [ 0.05, 0.05, 0.55 ]
     refractive-index: 1.52
 
 - define: mirror-material
-  extend: glass-material
+  extend: base-material
   value:
     transparency: 0
+    refractive-index: 1.52
 
 # ======================================================
 # the scene
@@ -59,6 +63,8 @@
       colors:
         - [1, 0.3, 0.7]
         - [0.3, 1, 0.7]
+      transform:
+        - [ translate, 0.01, 0.01, 0.01 ]
     specular: 0
 
 # the sky
@@ -76,21 +82,24 @@
     ambient: 0.9
     specular: 0
 
-# glass sphere
-- add: sphere
+# glass cube
+- add: cube
   transform:
-    - [ translate, 1.5, 1, 0 ]
+    - [ translate, 1.61, 1.0001, 0.01 ]
+    - [ rotatey, 0.698 ]
   material: glass-material
 
-# hollow sphere
-- add: sphere
+# hollow cube
+- add: cube
   transform:
-    - [ translate, 1.5, 1, 0 ]
-    - [ scale, 0.5, 0.5, 0.5 ]
+    - [ translate, 1.61, 1.0001, 0.01 ]
+    - [ scale, 0.75, 0.75, 0.75 ]
+    - [ rotatey, 0.698 ]
   material: base-material
 
-# mirrored sphere
-- add: sphere
+# mirrored cube
+- add: cube
   transform:
-    - [ translate, -1.5, 1, 0 ]
+    - [ translate, -1.61, 1.0001, 0.01 ]
+    - [ rotatey, -0.698 ]
   material: mirror-material

@@ -2,7 +2,7 @@
 # output filename
 # ======================================================
 
-- file: Images\RTC.ppm
+- file: Images\RTC_yaml.ppm
 
 # ======================================================
 # the camera
@@ -15,6 +15,9 @@
   from: [ -6, 6, -10 ]
   to: [ 6, 0, 6 ]
   up: [ -0.45, 1, 0 ]
+  reflection-depth: 6
+  antialias-level: 5
+  show-progress: true
 
 # ======================================================
 # light sources

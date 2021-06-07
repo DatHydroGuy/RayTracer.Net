@@ -2,7 +2,7 @@
 # output filename
 # ======================================================
 
-- file: Images\Chapter11_Play_YAML2.ppm
+- file: Images\Chapter11_Water_YAML2.ppm
 
 # ======================================================
 # the camera
@@ -12,16 +12,18 @@
   width: 1000
   height: 600
   field-of-view: 1.047
-  from: [0, 1.5, -5]
+  from: [2, 4, -5]
   to: [0, 1, 0]
   up: [0, 1, 0]
+  reflection-depth: 8
+  show-progress: true
 
 # ======================================================
 # the light
 # ======================================================
 
 - add: light
-  at: [-5, 3, -10]
+  at: [10, 10, -10]
   intensity: [1, 1, 1]
 
 # ======================================================
@@ -47,6 +49,16 @@
   value:
     transparency: 0
 
+- define: water-material
+  extend: base-material
+  value:
+    color: [ 0, 0.1, 0.2 ]
+    ambient: 0.1
+    specular: 0.5
+    transparency: 0.5
+    refractive-index: 1.33
+    casts-shadow: false
+
 # ======================================================
 # the scene
 # ======================================================
@@ -61,20 +73,43 @@
         - [0.3, 1, 0.7]
     specular: 0
 
-# the sky
+# left wall
 - add: plane
   transform:
-    - [translate, 0, 5, 0]
+    - [ rotatez, 1.571 ]
+    - [ translate, -4, 0, 0 ]
   material:
     pattern:
-      type: double-gradient
+      type: checker
       colors:
-        - [0.8, 0.8, 1]
-        - [0.1, 0.1, 1]
+        - [0, 0, 0]
+        - [1, 1, 1]
       transform:
-        - [ scale, 100000, 100000, 100000 ]
-    ambient: 0.9
+        - [ rotatey, 0.524 ]
+    color: [ 1, 0.9, 0.9 ]
     specular: 0
+
+# right wall
+- add: plane
+  transform:
+    - [ rotatex, 1.571 ]
+    - [ translate, 0, 0, 3 ]
+  material:
+    pattern:
+      type: checker
+      colors:
+        - [0, 0, 0]
+        - [1, 1, 1]
+      transform:
+        - [ rotatey, 0.524 ]
+    color: [ 1, 0.9, 0.9 ]
+    specular: 0
+
+# the water
+- add: plane
+  transform:
+    - [ translate, 0, 1.75, 0 ]
+  material: water-material
 
 # glass sphere
 - add: sphere
