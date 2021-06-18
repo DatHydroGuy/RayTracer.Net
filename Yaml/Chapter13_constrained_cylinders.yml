@@ -1,0 +1,112 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter13_constrained_cylinders_YAML2.ppm
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 600
+  field-of-view: 1.047
+  from: [0, 1.5, -6]
+  to: [0, 1, 0]
+  up: [0, 1, 0]
+  reflection-depth: 8
+  show-progress: true
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-5, 3, -10]
+  intensity: [1, 1, 1]
+
+# ======================================================
+# define some constants to avoid duplication
+# ======================================================
+
+- define: base-material
+  value:
+    color: [ 0.05, 0.05, 0.05 ]
+    diffuse: 0.1
+    shininess: 300
+    reflective: 1
+    transparency: 1
+    refractive-index: 1
+
+- define: glass-material
+  extend: base-material
+  value:
+    color: [ 0.05, 0.05, 0.55 ]
+    refractive-index: 1.52
+
+- define: mirror-material
+  extend: base-material
+  value:
+    transparency: 0
+    refractive-index: 1.52
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  material:
+    pattern:
+      type: checker
+      colors:
+        - [1, 0.3, 0.7]
+        - [0.3, 1, 0.7]
+      transform:
+        - [ translate, 0.01, 0.01, 0.01 ]
+    specular: 0
+
+# the sky
+- add: plane
+  transform:
+    - [translate, 0, 5, 0]
+  material:
+    pattern:
+      type: double-gradient
+      colors:
+        - [0.8, 0.8, 1]
+        - [0.1, 0.1, 1]
+      transform:
+        - [ scale, 100000, 100000, 100000 ]
+    ambient: 0.9
+    specular: 0
+
+# glass cylinder
+- add: cylinder
+  minimum: 0
+  maximum: 2
+  transform:
+    - [ translate, 1.61, 0.0001, 0.01 ]
+    - [ rotatey, 0.698 ]
+  material: glass-material
+
+# hollow cylinder
+- add: cylinder
+  minimum: 0.2
+  maximum: 1.8
+  transform:
+    - [ translate, 1.61, 0.0001, 0.01 ]
+    - [ scale, 0.75, 1, 0.75 ]
+    - [ rotatey, 0.698 ]
+  material: base-material
+
+# mirrored cylinder
+- add: cylinder
+  minimum: 0
+  maximum: 2
+  transform:
+    - [ translate, -1.61, 0.0001, 0.01 ]
+    - [ rotatey, -0.698 ]
+  material: mirror-material
+  

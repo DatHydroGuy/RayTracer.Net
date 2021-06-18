@@ -1,0 +1,114 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter13_capped_cones_YAML2.ppm
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 600
+  field-of-view: 1.047
+  from: [0, 2.1, -6]
+  to: [0, 1, 0]
+  up: [0, 1, 0]
+  reflection-depth: 8
+  show-progress: true
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-5, 3, -10]
+  intensity: [1, 1, 1]
+
+# ======================================================
+# define some constants to avoid duplication
+# ======================================================
+
+- define: base-material
+  value:
+    color: [ 0.05, 0.05, 0.05 ]
+    diffuse: 0.1
+    shininess: 300
+    reflective: 1
+    transparency: 1
+    refractive-index: 1
+
+- define: glass-material
+  extend: base-material
+  value:
+    color: [ 0.05, 0.05, 0.55 ]
+    refractive-index: 1.52
+
+- define: mirror-material
+  extend: base-material
+  value:
+    transparency: 0
+    refractive-index: 1.52
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  material:
+    pattern:
+      type: checker
+      colors:
+        - [1, 0.3, 0.7]
+        - [0.3, 1, 0.7]
+      transform:
+        - [ translate, 0.01, 0.01, 0.01 ]
+    specular: 0
+
+# the sky
+- add: plane
+  transform:
+    - [translate, 0, 5, 0]
+  material:
+    pattern:
+      type: double-gradient
+      colors:
+        - [0.8, 0.8, 1]
+        - [0.1, 0.1, 1]
+      transform:
+        - [ scale, 100000, 100000, 100000 ]
+    ambient: 0.9
+    specular: 0
+
+# glass cone
+- add: cone
+  minimum: -1
+  maximum: 0
+  closed: true
+  transform:
+    - [ translate, 1.61, 2.0001, 0.01 ]
+    - [ scale, 1, 2, 1 ]
+  material: glass-material
+
+# hollow cone
+- add: cone
+  minimum: -1
+  maximum: 0
+  closed: true
+  transform:
+    - [ translate, 1.61, 1.5001, 0.01 ]
+    - [ scale, 0.5, 1, 0.5 ]
+  material: base-material
+
+# mirrored cone
+- add: cone
+  minimum: 0
+  maximum: 1
+  closed: true
+  transform:
+    - [ translate, -1.61, 0.0001, -0.25 ]
+    - [ scale, 1, 2.5, 1 ]
+  material: mirror-material
+  

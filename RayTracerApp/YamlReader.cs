@@ -8,16 +8,18 @@ namespace RayTracerApp
 {
     public class YamlReader
     {
-        // private List<string> materialList = new List<string>{"color", "ambient", "diffuse", "specular", "shininess", "reflective", "transparency", "refractive-index", "casts-shadow", "pattern"};
-        // private List<string> transformList = new List<string>{"translate", "scale", "rotate-x", "rotate-y", "rotate-z"};
-        private Dictionary<string, Dictionary<object, object>> _materialDefinitions = new Dictionary<string, Dictionary<object, object>>();
-        private Dictionary<string, List<object>> _transformDefinitions = new Dictionary<string, List<object>>();
-        private Dictionary<string, int> _renderingDetails = new Dictionary<string, int> {{"reflectiondepth", 5}, {"antialiaslevel", 1}, {"showprogress", 0}};
+        private readonly Dictionary<string, Dictionary<object, object>> _materialDefinitions = new();
+        private readonly Dictionary<string, List<object>> _transformDefinitions = new();
+        private readonly Dictionary<string, Group> _groupDefinitions = new();
+        private readonly Dictionary<string, int> _renderingDetails = new() {{"reflectiondepth", 5}, {"antialiaslevel", 1}, {"showprogress", 0}};
+        private static string _imagesFolder = "";
 
         public YamlReader(string yamlFile)
         {
             if (!System.IO.File.Exists(yamlFile))
                 System.Console.WriteLine($"YAML file {yamlFile} not found.");
+            
+            CreateImagesFolder();
 
             var rawLines = System.IO.File.ReadAllText(yamlFile);
             var deserializer = new DeserializerBuilder()
@@ -27,33 +29,46 @@ namespace RayTracerApp
             ConvertToObjects(rawObjects);
         }
 
-        public void ConvertToObjects(List<Dictionary<string, object>> objects)
+        private static void CreateImagesFolder()
+        {
+            var currDir = System.IO.Directory.GetCurrentDirectory();
+            var parentDir = System.IO.Path.GetFullPath(System.IO.Path.Combine(currDir, ".."));
+            var imageDir = System.IO.Path.GetFullPath(System.IO.Path.Combine(parentDir, "Images"));
+            if (!System.IO.Directory.Exists(imageDir))
+            {
+                System.IO.Directory.CreateDirectory(imageDir);
+            }
+            _imagesFolder = imageDir;
+        }
+
+        private void ConvertToObjects(IReadOnlyCollection<Dictionary<string, object>> objects)
         {
             var world = new World();
-            var cameraInfo = objects.Where(x => x.Keys.First() == "add" && x.Values.First().ToString() == "camera").First().Skip(1).ToList();
+            var cameraInfo = objects.First(x => x.Keys.First() == "add" && x.Values.First().ToString() == "camera").Skip(1).ToList();
             var camera = ProcessCameraObject(cameraInfo);
             string outFile = null;
 
             foreach (var item in objects)
             {
-                if (item.Keys.First() == "add")
+                switch (item.Keys.First())
                 {
-                    if (item.Values.First().ToString() != "camera")
+                    case "add":
                     {
-                        ProcessWorldObject(world, item);
+                        if (item.Values.First().ToString() != "camera")
+                            ProcessWorldObject(world, item);
+                        break;
                     }
-                }
-                else if (item.Keys.First() == "define")
-                {
-                    ProcessDefinitions(item);
-                }
-                else if (item.Keys.First() == "file")
-                {
-                    outFile = item.Values.First().ToString();
-                    if (System.Diagnostics.Debugger.IsAttached)
-                        outFile = "..\\" + outFile;
-                    outFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), outFile));
-                    System.Console.WriteLine($"Writing to file: {outFile}");
+                    case "define":
+                        ProcessDefinitions(item);
+                        break;
+                    case "file":
+                    {
+                        outFile = item.Values.First().ToString();
+                        outFile = outFile.Split(System.IO.Path.DirectorySeparatorChar).Last();
+                        outFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(_imagesFolder, outFile ?? "default.ppm"));
+                        System.Console.WriteLine($"Writing to file: {outFile}");
+                        break;
+                    }
                 }
             }
 
@@ -69,68 +84,94 @@ namespace RayTracerApp
             System.Console.WriteLine($"Defining: {definitionData.Values.First()}");
             var materialValuesList = new Dictionary<object, object>();
             var transformValuesList = new List<object>();
-            string name = null;
+            var name = "";
 
             // Key is either define, extend, or value
-            foreach (var item in definitionData)
+            foreach (var (definitionKey, definitionValue) in definitionData)
             {
-                if (item.Key == "define")
+                switch (definitionKey)
                 {
-                    name = item.Value.ToString();
-                }
-                else if (item.Key == "extend")
-                {
-                    // Pre-existing value, so need to perform a lookup
-                    var itemString = item.Value.ToString();
-                    if (_materialDefinitions.ContainsKey(itemString))
-                        materialValuesList = materialValuesList.Concat(_materialDefinitions[itemString]).ToDictionary(x => x.Key, x => x.Value);
-                    else if (_transformDefinitions.ContainsKey(itemString))
-                        transformValuesList.AddRange(_transformDefinitions[name]);
-                    else
-                        throw new System.Exception($"Unknown items in definition data: ({item.Key} : {item.Value})");
-                }
-                else if (item.Key == "value")
-                {
-                    var tempMaterial = item.Value as Dictionary<object, object>;
-                    var tempTransform = item.Value as List<object>;
-
-                    if (tempMaterial != null)
-                    {
-                        foreach (var kvp in tempMaterial)
+                    case "define":
+                        name = definitionValue.ToString() ?? "";
+                        break;
+                    case "extend":
+                        // Pre-existing value, so need to perform a lookup
+                        LookupExtendItem(definitionKey, definitionValue, name, ref materialValuesList, ref transformValuesList);
+                        break;
+                    case "value":
+                        switch (definitionValue)
                         {
-                            if (!materialValuesList.TryAdd(kvp.Key, kvp.Value))
-                            {
-                                materialValuesList[kvp.Key] = kvp.Value;    // overwrite any pre-existing values
-                            }
+                            // case Group tempGroup:
+                            //     System.Console.WriteLine(tempGroup);
+                            //     break;
+                            case Dictionary<object, object> tempObject:
+                                var (firstKey, firstValue) = tempObject.First();
+                                if (firstKey.ToString() == "add" && firstValue.ToString() == "group")
+                                {
+                                    DefineGroup(name, tempObject);
+                                }
+                                else
+                                {
+                                    foreach (var (materialDefKey, materialDefValue) in tempObject.Where(kvp => !materialValuesList.TryAdd(kvp.Key, kvp.Value)))
+                                    {
+                                        materialValuesList[materialDefKey] = materialDefValue;    // overwrite any pre-existing values
+                                    }
+                                    _materialDefinitions.Add(name, materialValuesList);
+                                }
+                                break;
+                            case List<object> tempTransform:
+                                DefineTransform(name, tempTransform, ref transformValuesList);
+                                break;
+                            default:
+                                throw new System.Exception($"Unknown items in definition data: ({definitionData.First().Value} : {definitionKey})");
                         }
-                        
-                        _materialDefinitions.Add(name, materialValuesList);
-                    }
-                    else if (tempTransform != null)
-                    {
-                        foreach (var item2 in tempTransform)
-                        {
-                            if (_transformDefinitions.ContainsKey(item2.ToString()))
-                            {
-                                transformValuesList.AddRange(_transformDefinitions[item2.ToString()]);
-                            }
-                            else
-                            {
-                                transformValuesList.Add(item2);
-                            }
-                        }                        
-                        _transformDefinitions.Add(name, transformValuesList);
-                    }
-                    else
-                    {
-                        throw new System.Exception($"Unknown items in definition data: ({definitionData.First().Value} : {item.Key})");
-                    }
+                        break;
+                    default:
+                        throw new System.Exception($"Unknown items in definition data: ({definitionKey} : {definitionValue})");
+                }
+            }
+        }
+
+        private void DefineTransform(string name, List<object> tempTransform, ref List<object> transformValuesList)
+        {
+            foreach (var item in tempTransform)
+            {
+                var itemStr = item.ToString() ?? "";
+                if (_transformDefinitions.ContainsKey(itemStr))
+                {
+                    transformValuesList.AddRange(_transformDefinitions[itemStr]);
                 }
                 else
                 {
-                    throw new System.Exception($"Unknown items in definition data: ({item.Key} : {item.Value})");
+                    transformValuesList.Add(item);
                 }
+            }                        
+            _transformDefinitions.Add(name, transformValuesList);
+        }
+
+        private void DefineGroup(string name, Dictionary<object, object> groupObject)
+        {
+            var group = new Group();
+            var children = (List<object>)groupObject.Last().Value;
+            foreach (var child in children)
+            {
+                var typedChild = (Dictionary<object, object>) child;
+                var sdg = typedChild.Select(pair => new KeyValuePair<string, object>(pair.Key.ToString(), pair.Value)).ToList();
+                group.AddChild(ProcessShape(sdg.ToList()));
             }
+            _groupDefinitions.Add(name, group);
+        }
+
+        private void LookupExtendItem(string definitionKey, object definitionValue, string name,
+                                      ref Dictionary<object, object> materialValuesList, ref List<object> transformValuesList)
+        {
+            var itemString = definitionValue.ToString() ?? "";
+            if (_materialDefinitions.ContainsKey(itemString))
+                materialValuesList = materialValuesList.Concat(_materialDefinitions[itemString]).ToDictionary(x => x.Key, x => x.Value);
+            else if (_transformDefinitions.ContainsKey(itemString))
+                transformValuesList.AddRange(_transformDefinitions[name]);
+            else
+                throw new System.Exception($"Unknown items in definition data: ({definitionKey} : {definitionValue})");
         }
 
         private void ProcessWorldObject(World world, Dictionary<string, object> item)
@@ -152,57 +193,134 @@ namespace RayTracerApp
                     world.AddShapeToWorld(ProcessShape(item.ToList()));
                     break;
                 default:
+                    // Need to check if we have a group name
+                    if (CheckGroups(item.Values.First().ToString()) is Group group)
+                    {
+                        AddGroupToWorld(world, group);
+                    }
                     break;
+            }
+        }
+
+        private void ProcessGroup(Group group)
+        {
+        }
+
+        private void AddGroupToWorld(World world, Group group)
+        {
+            foreach (var child in group.Shapes)
+            {
+                if (child is Group subGroup)
+                    AddGroupToWorld(world, subGroup);
+                else
+                {
+                    child.Transform = group.Transform * child.Transform;
+                    world.AddShapeToWorld(child);
+                }
             }
         }
 
         private Shape DetermineShape(string shapeName)
         {
-            switch (shapeName)
+            return shapeName switch
             {
-                case "plane":
-                    return new Plane();
-                case "sphere":
-                    return new Sphere();
-                case "cube":
-                    return new Cube();
-                case "cone":
-                    return new Cone();
-                case "cylinder":
-                    return new Cylinder();
-                case "triangle":
-                    return new Triangle(null, null, null);
-                case "smooth-triangle":
-                    return new SmoothTriangle(null, null, null, null, null, null);
-                default:
-                    throw new System.Exception("Unknown Shape type in YAML file");
-            }
+                "plane" => new Plane(),
+                "sphere" => new Sphere(),
+                "cube" => new Cube(),
+                "cone" => new Cone(),
+                "cylinder" => new Cylinder(),
+                "triangle" => new Triangle(null, null, null),
+                "smooth-triangle" => new SmoothTriangle(null, null, null, null, null, null),
+                _ => CheckGroups(shapeName)
+            };
         }
 
-        private Shape ProcessShape(List<KeyValuePair<string, object>> shapeData)
+        private Shape CheckGroups(string nameToCheck)
+        {
+            if (_groupDefinitions.ContainsKey(nameToCheck))
+            {
+                System.Console.WriteLine($"Found group {nameToCheck}");
+                var foundGroup = _groupDefinitions[nameToCheck];
+                var newGroup = new Group{
+                    Material = foundGroup.Material,
+                    Origin = foundGroup.Origin,
+                    Parent = foundGroup.Parent,
+                    Shapes = foundGroup.Shapes,
+                    Transform = foundGroup.Transform
+                };
+                return newGroup;
+            }
+            else
+                throw new System.Exception($"Unknown Shape type in YAML file: {nameToCheck}");
+        }
+
+        private Shape ProcessShape(IReadOnlyList<KeyValuePair<string, object>> shapeData)
         {
             var shapeObject = DetermineShape(shapeData[0].Value.ToString());
-            for (int i = 1; i < shapeData.Count; i++)
+            for (var i = 1; i < shapeData.Count; i++)
             {
-                var attribute = shapeData[i];
-                if (attribute.Key == "material")
+                var (shapeKey, shapeValue) = shapeData[i];
+                switch (shapeKey)
                 {
-                    // Need to de-cipher material attributes
-                    var attributeDictionary = attribute.Value as Dictionary<object, object>;
-                    if (attributeDictionary == null)
-                        shapeObject.Material = ProcessMaterial(_materialDefinitions[attribute.Value.ToString()]);   // pre-defined material definition
-                    else
-                        shapeObject.Material = ProcessMaterial(attributeDictionary);        // new material definition
-                }
-                else if (attribute.Key == "transform")
-                {
-                    // Need to de-cipher transform attributes
-                    var attributeList = attribute.Value as List<object>;
-                    shapeObject.Transform = ProcessTransform(attributeList);
-                }
-                else
-                {
-                    throw new System.Exception($"Unknown attribute in shape data: ({attribute.Key}: {attribute.Value})");
+                    case "material":
+                        // Need to de-cipher material attributes
+                        var attribValStr = shapeValue.ToString() ?? "";
+                        shapeObject.Material = ProcessMaterial(shapeValue is not Dictionary<object, object> attributeDictionary ? _materialDefinitions[attribValStr] : attributeDictionary);
+                        break;
+                    case "transform":
+                        // Need to de-cipher transform attributes
+                        var attributeList = shapeValue as List<object>;
+                        shapeObject.Transform = ProcessTransform(attributeList);
+                        break;
+                    case "minimum":
+                        switch (shapeObject)
+                        {
+                            case Cylinder cylinder:
+                                cylinder.Minimum = ExtractDouble(shapeValue.ToString(), "Cylinder minimum");
+                                break;
+                            case Cone cone:
+                                cone.Minimum = ExtractDouble(shapeValue.ToString(), "Cone minimum");
+                                break;
+                            default:
+                                throw new System.Exception($"Unknown shape type with minimum attribute: {shapeObject.GetType().Name}");
+                        }
+                        break;
+                    case "maximum":
+                        switch (shapeObject)
+                        {
+                            case Cylinder cylinder:
+                                cylinder.Maximum = ExtractDouble(shapeValue.ToString(), "Cylinder maximum");
+                                break;
+                            case Cone cone:
+                                cone.Maximum = ExtractDouble(shapeValue.ToString(), "Cone maximum");
+                                break;
+                            default:
+                                throw new System.Exception($"Unknown shape type with maximum attribute: {shapeObject.GetType().Name}");
+                        }
+                        break;
+                    case "closed":
+                        switch (shapeObject)
+                        {
+                            case Cylinder cylinder:
+                                cylinder.Closed = ExtractBoolean(shapeValue.ToString(), "Cylinder closed");
+                                break;
+                            case Cone cone:
+                                cone.Closed = ExtractBoolean(shapeValue.ToString(), "Cone closed");
+                                break;
+                            default:
+                                throw new System.Exception($"Unknown shape type with closed attribute: {shapeObject.GetType().Name}");
+                        }
+                        break;
+                    default:
+                        if (_groupDefinitions.ContainsKey(shapeKey))
+                        {
+                            System.Console.WriteLine($"Found group {shapeKey}");
+                        }
+                        else
+                        {
+                            throw new System.Exception($"Unknown attribute in shape data: ({shapeKey}: {shapeValue})");
+                        }
+                        break;
                 }
             }
             return shapeObject;
@@ -214,7 +332,7 @@ namespace RayTracerApp
 
             foreach (var materialInstruction in materialData)
             {
-                var instruction = materialInstruction.Key.ToString();
+                var instruction = materialInstruction.Key.ToString() ?? "";
                 if (_transformDefinitions.ContainsKey(instruction))
                 {
                     material = ProcessMaterial(_materialDefinitions[instruction]);
@@ -279,40 +397,42 @@ namespace RayTracerApp
             Pattern pattern = null;
             foreach (var key in patternInstructions.Keys)
             {
-                var instruction = key.ToString();
+                var instruction = key.ToString() ?? "";
                 if (instruction.Contains("type"))
                 {
                     pattern = GetEmptyPattern(patternInstructions[instruction].ToString());
                 }
                 else if (instruction.Contains("parent-pattern"))
                 {
-                    ((NestedPattern)pattern).ParentPattern = ProcessPattern(patternInstructions[instruction]);
+                    if (pattern is NestedPattern nested)
+                        nested.ParentPattern = ProcessPattern(patternInstructions[instruction]);
                 }
                 else if (instruction.Contains("patterns"))
                 {
-                    if (pattern is NestedPattern)
+                    switch (pattern)
                     {
-                        var subPatterns = patternInstructions[instruction] as Dictionary<object, object>;
-                        if (subPatterns == null)
+                        case NestedPattern nestedPattern:
                         {
-                            throw new System.Exception("Invalid sub-pattern data format");
+                            if (patternInstructions[instruction] is not Dictionary<object, object> subPatterns)
+                            {
+                                throw new System.Exception("Invalid sub-pattern data format");
+                            }
+                            nestedPattern.PatternA = ProcessPattern(subPatterns["pattern-a"]);
+                            nestedPattern.PatternB = ProcessPattern(subPatterns["pattern-b"]);
+                            break;
                         }
-                        ((NestedPattern)pattern).PatternA = ProcessPattern(subPatterns["pattern-a"]);
-                        ((NestedPattern)pattern).PatternB = ProcessPattern(subPatterns["pattern-b"]);
-                    }
-                    else if (pattern is BlendedPattern)
-                    {
-                        var subPatterns = patternInstructions[instruction] as Dictionary<object, object>;
-                        if (subPatterns == null)
+                        case BlendedPattern blendedPattern:
                         {
-                            throw new System.Exception("Invalid sub-pattern data format");
+                            if (patternInstructions[instruction] is not Dictionary<object, object> subPatterns)
+                            {
+                                throw new System.Exception("Invalid sub-pattern data format");
+                            }
+                            blendedPattern.PatternA = ProcessPattern(subPatterns["pattern-a"]);
+                            blendedPattern.PatternB = ProcessPattern(subPatterns["pattern-b"]);
+                            break;
                         }
-                        ((BlendedPattern)pattern).PatternA = ProcessPattern(subPatterns["pattern-a"]);
-                        ((BlendedPattern)pattern).PatternB = ProcessPattern(subPatterns["pattern-b"]);
-                    }
-                    else
-                    {
-                        throw new System.Exception("Invalid compound pattern type");
+                        default:
+                            throw new System.Exception("Invalid compound pattern type");
                     }
                 }
                 else if (instruction.Contains("transform"))
@@ -322,7 +442,9 @@ namespace RayTracerApp
                     {
                         throw new System.Exception("Invalid transform format in pattern data");
                     }
-                    pattern.Transform = ProcessTransform(transform);
+
+                    if (pattern != null)
+                        pattern.Transform = ProcessTransform(transform);
                 }
                 else if (instruction.Contains("colours") || instruction.Contains("colors"))
                 {
@@ -333,6 +455,8 @@ namespace RayTracerApp
                     }
                     
                     var colourLevels = ExtractTuple(colours[0], "light intensity");
+                    if (pattern == null)
+                        continue;
                     pattern.ColourA = new Colour(colourLevels[0], colourLevels[1], colourLevels[2]);
                     colourLevels = ExtractTuple(colours[1], "light intensity");
                     pattern.ColourB = new Colour(colourLevels[0], colourLevels[1], colourLevels[2]);
@@ -342,36 +466,25 @@ namespace RayTracerApp
             return pattern;
         }
 
-        private Pattern GetEmptyPattern(string patternType)
+        private static Pattern GetEmptyPattern(string patternType)
         {
-            switch (patternType)
+            return patternType switch
             {
-                case "blended":
-                    return new BlendedPattern(null, null);
-                case "checker":
-                    return new CheckerPattern(Colour.BLACK, Colour.WHITE);
-                case "double-gradient":
-                    return new DoubleGradientPattern(Colour.BLACK, Colour.WHITE);
-                case "double-gradient-ring":
-                    return new DoubleGradientRingPattern(Colour.BLACK, Colour.WHITE);
-                case "gradient":
-                    return new GradientPattern(Colour.BLACK, Colour.WHITE);
-                case "gradient-ring":
-                    return new GradientRingPattern(Colour.BLACK, Colour.WHITE);
-                case "nested":
-                    return new NestedPattern(null, null, null);
-                case "perturbed":
-                    return new PerturbedPattern(null);
-                case "ring":
-                    return new RingPattern(Colour.BLACK, Colour.WHITE);
-                case "stripe":
-                    return new StripePattern(Colour.BLACK, Colour.WHITE);
-                default:
-                    throw new System.Exception($"Unknown Pattern type {patternType}");
-            }
+                "blended" => new BlendedPattern(null, null),
+                "checker" => new CheckerPattern(Colour.BLACK, Colour.WHITE),
+                "double-gradient" => new DoubleGradientPattern(Colour.BLACK, Colour.WHITE),
+                "double-gradient-ring" => new DoubleGradientRingPattern(Colour.BLACK, Colour.WHITE),
+                "gradient" => new GradientPattern(Colour.BLACK, Colour.WHITE),
+                "gradient-ring" => new GradientRingPattern(Colour.BLACK, Colour.WHITE),
+                "nested" => new NestedPattern(null, null, null),
+                "perturbed" => new PerturbedPattern(null),
+                "ring" => new RingPattern(Colour.BLACK, Colour.WHITE),
+                "stripe" => new StripePattern(Colour.BLACK, Colour.WHITE),
+                _ => throw new System.Exception($"Unknown Pattern type {patternType}")
+            };
         }
 
-        private Matrix ProcessTransform(List<object> transformData)
+        private Matrix ProcessTransform(IEnumerable<object> transformData)
         {
             var rotation = Matrix.Identity(4);
             var scaling = Matrix.Identity(4);
@@ -380,14 +493,18 @@ namespace RayTracerApp
 
             foreach (var transformInstruction in transformData)
             {
-                if (_transformDefinitions.ContainsKey(transformInstruction.ToString()))
+                var instructionStr = transformInstruction.ToString() ?? "";
+                if (_transformDefinitions.ContainsKey(instructionStr))
                 {
-                    definedTransform = ProcessTransform(_transformDefinitions[transformInstruction.ToString()]);
+                    definedTransform = ProcessTransform(_transformDefinitions[instructionStr]);
                 }
                 else
                 {
                     var transformItem = transformInstruction as List<object>;
-                    var instruction = transformItem[0].ToString();
+                    if (transformItem == null)
+                        continue;
+                    
+                    var instruction = transformItem[0].ToString() ?? "";
 
                     if (instruction.Contains("rotate-x") || instruction.Contains("rotatex"))
                     {
@@ -425,21 +542,20 @@ namespace RayTracerApp
             return translation * scaling * rotation * definedTransform;
         }
 
-        private Light ProcessLight(List<KeyValuePair<string, object>> lightData)
+        private static Light ProcessLight(IEnumerable<KeyValuePair<string, object>> lightData)
         {
             Point lightPosition = null;
             Colour lightIntensity = null;
-            for (int i = 0; i < lightData.Count; i++)
+            foreach (var (lightKey, lightValue) in lightData)
             {
-                var attribute = lightData[i];
-                if (attribute.Key.StartsWith("at"))
+                if (lightKey.StartsWith("at"))
                 {
-                    var positionCoords = ExtractTuple(attribute.Value, "light position");
+                    var positionCoords = ExtractTuple(lightValue, "light position");
                     lightPosition = new Point(positionCoords[0], positionCoords[1], positionCoords[2]);
                 }
-                else if (attribute.Key.StartsWith("intensity"))
+                else if (lightKey.StartsWith("intensity"))
                 {
-                    var colourLevels = ExtractTuple(attribute.Value, "light intensity");
+                    var colourLevels = ExtractTuple(lightValue, "light intensity");
                     lightIntensity = new Colour(colourLevels[0], colourLevels[1], colourLevels[2]);
                 }
                 else
@@ -450,80 +566,76 @@ namespace RayTracerApp
             return new Light(lightPosition, lightIntensity);
         }
 
-        private Camera ProcessCameraObject(List<KeyValuePair<string, object>> objData)
+        private Camera ProcessCameraObject(IEnumerable<KeyValuePair<string, object>> objData)
         {
-            int width = 200;
-            int height = 200;
-            double fieldOfView = 0.785;
+            var width = 200;
+            var height = 200;
+            var fieldOfView = 0.785;
             var from = new Point();
             var to = new Point();
             var up = new Vector();
             System.Console.WriteLine("Adding: Camera");
 
-            for (int i = 0; i < objData.Count; i++)
+            foreach (var (cameraKey, cameraValue) in objData)
             {
-                var attribute = objData[i];
-                var attributeValue = attribute.Value.ToString();
-                if (attribute.Key.StartsWith("width"))
+                var attributeValue = cameraValue.ToString();
+                if (cameraKey.StartsWith("width"))
                 {
                     width = ExtractInteger(attributeValue, "camera width");
                 }
-                else if (attribute.Key.StartsWith("height"))
+                else if (cameraKey.StartsWith("height"))
                 {
                     height = ExtractInteger(attributeValue, "Camera height");
                 }
-                else if (attribute.Key.StartsWith("field-of-view"))
+                else if (cameraKey.StartsWith("field-of-view"))
                 {
                     fieldOfView = ExtractDouble(attributeValue, "Camera FoV");
                 }
-                else if (attribute.Key.StartsWith("from"))
+                else if (cameraKey.StartsWith("from"))
                 {
-                    var tuple = ExtractTuple(attribute.Value, "Camera from");
-                    from = new Point(tuple[0], tuple[1], tuple[2]);
+                    var tuple = ExtractTuple(cameraValue, "Camera from");
+                    @from = new Point(tuple[0], tuple[1], tuple[2]);
                 }
-                else if (attribute.Key.StartsWith("to"))
+                else if (cameraKey.StartsWith("to"))
                 {
-                    var tuple = ExtractTuple(attribute.Value, "Camera to");
+                    var tuple = ExtractTuple(cameraValue, "Camera to");
                     to = new Point(tuple[0], tuple[1], tuple[2]);
                 }
-                else if (attribute.Key.StartsWith("up"))
+                else if (cameraKey.StartsWith("up"))
                 {
-                    var tuple = ExtractTuple(attribute.Value, "Camera up");
+                    var tuple = ExtractTuple(cameraValue, "Camera up");
                     up = new Vector(tuple[0], tuple[1], tuple[2]);
                 }
-                else if (attribute.Key.StartsWith("reflection-depth"))
+                else if (cameraKey.StartsWith("reflection-depth"))
                 {
                     _renderingDetails["reflectiondepth"] = ExtractInteger(attributeValue, "Camera reflection depth");
                 }
-                else if (attribute.Key.StartsWith("antialias-level"))
+                else if (cameraKey.StartsWith("antialias-level"))
                 {
                     _renderingDetails["antialiaslevel"] = ExtractInteger(attributeValue, "Camera anti-alias level");
                 }
-                else if (attribute.Key.StartsWith("show-progress"))
+                else if (cameraKey.StartsWith("show-progress"))
                 {
                     _renderingDetails["showprogress"] = ExtractBoolean(attributeValue, "Camera show progress") ? 1 : 0;
                 }
                 else
                 {
-                    throw new System.Exception($"Unknown camera attribute: {attribute.Key}");
+                    throw new System.Exception($"Unknown camera attribute: {cameraKey}");
                 }
             }
 
-            var camera = new Camera(width, height, fieldOfView);
-            camera.Transform = Transformations.ViewTransform(from, to, up);
+            var camera = new Camera(width, height, fieldOfView)
+            {
+                Transform = Transformations.ViewTransform(@from, to, up)
+            };
             return camera;
         }
 
-        private List<double> ExtractTuple(object tupleToConvert, string description)
+        private static List<double> ExtractTuple(object tupleToConvert, string description)
         {
             try
             {
-                var xyz = new List<double>();
-                foreach (var coord in tupleToConvert as IEnumerable<object>)
-                {
-                    xyz.Add(ExtractDouble(coord.ToString(), description));
-                }
-                return xyz;
+                return (from coord in (IEnumerable<object>) tupleToConvert select ExtractDouble(coord.ToString(), description)).ToList();
             }
             catch (System.Exception)
             {
@@ -531,31 +643,25 @@ namespace RayTracerApp
             }
         }
 
-        private bool ExtractBoolean(string valueToConvert, string description)
+        private static bool ExtractBoolean(string valueToConvert, string description)
         {
-            bool result;
-            if (bool.TryParse(valueToConvert, out result))
+            if (bool.TryParse(valueToConvert, out var result))
                 return result;
-            else
-                throw new System.FormatException($"Could not convert {valueToConvert} into a boolean for {description}");
+            throw new System.FormatException($"Could not convert {valueToConvert} into a boolean for {description}");
         }
 
-        private int ExtractInteger(string valueToConvert, string description)
+        private static int ExtractInteger(string valueToConvert, string description)
         {
-            int result;
-            if (int.TryParse(valueToConvert, out result))
+            if (int.TryParse(valueToConvert, out var result))
                 return result;
-            else
-                throw new System.FormatException($"Could not convert {valueToConvert} into an integer for {description}");
+            throw new System.FormatException($"Could not convert {valueToConvert} into an integer for {description}");
         }
 
-        private double ExtractDouble(string valueToConvert, string description)
+        private static double ExtractDouble(string valueToConvert, string description)
         {
-            double result;
-            if (double.TryParse(valueToConvert, out result))
+            if (double.TryParse(valueToConvert, out var result))
                 return result;
-            else
-                throw new System.FormatException($"Could not convert {valueToConvert} into a double for {description}");
+            throw new System.FormatException($"Could not convert {valueToConvert} into a double for {description}");
         }
     }
 }
