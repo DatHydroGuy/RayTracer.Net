@@ -14,7 +14,7 @@ namespace RayTracer.Tests
 
         public override Pattern Clone()
         {
-            return new TestPattern(ColourA, ColourB);
+            return new TestPattern(ColourA.Clone(), ColourB.Clone());
         }
     }
 

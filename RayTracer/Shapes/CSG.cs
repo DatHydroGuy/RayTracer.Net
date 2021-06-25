@@ -97,7 +97,7 @@ namespace RayTracer
         {
             return new CSG(Operation, Left, Right)
             {
-                Origin = Origin,
+                Origin = Origin.Clone(),
                 Material = Material.Clone(),
                 Transform = Transform.Clone(),
                 Parent = Parent

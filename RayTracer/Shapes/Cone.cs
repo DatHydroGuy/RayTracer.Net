@@ -60,7 +60,7 @@ namespace RayTracer
             return new Cone
             {
                 Origin = Origin.Clone(),
-                Material = Material,
+                Material = Material.Clone(),
                 Transform = Transform.Clone(),
                 Parent = Parent,
                 Radius = Radius,

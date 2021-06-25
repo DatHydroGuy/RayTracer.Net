@@ -46,7 +46,7 @@ namespace RayTracer
             return new Torus(MajorRadius, MinorRadius)
             {
                 Origin = Origin.Clone(),
-                Material = Material,
+                Material = Material.Clone(),
                 Transform = Transform.Clone(),
                 Parent = Parent
             };

@@ -14,7 +14,7 @@ namespace RayTracer
 
         public override CheckerPattern Clone()
         {
-            return new CheckerPattern(ColourA, ColourB);
+            return new CheckerPattern(ColourA.Clone(), ColourB.Clone());
         }
     }
 }

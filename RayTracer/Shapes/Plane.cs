@@ -25,7 +25,7 @@ namespace RayTracer
             return new Plane
             {
                 Origin = Origin.Clone(),
-                Material = Material,
+                Material = Material.Clone(),
                 Transform = Transform.Clone(),
                 Parent = Parent
             };

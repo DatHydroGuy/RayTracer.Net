@@ -15,7 +15,7 @@ namespace RayTracer
 
         public override GradientPattern Clone()
         {
-            return new GradientPattern(ColourA, ColourB);
+            return new GradientPattern(ColourA.Clone(), ColourB.Clone());
         }
     }
 }

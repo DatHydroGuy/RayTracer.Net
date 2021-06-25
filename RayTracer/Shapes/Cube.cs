@@ -25,7 +25,7 @@ namespace RayTracer
             return new Cube
             {
                 Origin = Origin.Clone(),
-                Material = Material,
+                Material = Material.Clone(),
                 Transform = Transform.Clone(),
                 Parent = Parent
             };

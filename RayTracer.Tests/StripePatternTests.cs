@@ -76,5 +76,6 @@ namespace RayTracer.Tests
             // Assert
             Assert.Equal(orig.ColourA, result.ColourA);
             Assert.Equal(orig.ColourB, result.ColourB);
-        }    }
+        }
+    }
 }

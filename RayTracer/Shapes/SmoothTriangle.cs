@@ -88,7 +88,7 @@ namespace RayTracer
             return new SmoothTriangle(Vertex1, Vertex2, Vertex3, Normal1, Normal2, Normal3)
             {
                 Origin = Origin.Clone(),
-                Material = Material,
+                Material = Material.Clone(),
                 Transform = Transform.Clone(),
                 Parent = Parent
             };

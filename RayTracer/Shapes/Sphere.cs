@@ -35,7 +35,7 @@ namespace RayTracer
             return new Sphere
             {
                 Origin = Origin.Clone(),
-                Material = Material,
+                Material = Material.Clone(),
                 Transform = Transform.Clone(),
                 Parent = Parent,
                 Radius = Radius

@@ -49,8 +49,8 @@ namespace RayTracer
         {
             return new BlendedPattern(PatternA.Clone(), PatternB.Clone())
             {
-                ColourA = ColourA,
-                ColourB = ColourB
+                ColourA = ColourA == null ? null : ColourA.Clone(),
+                ColourB = ColourB == null ? null : ColourB.Clone()
             };
         }
     }

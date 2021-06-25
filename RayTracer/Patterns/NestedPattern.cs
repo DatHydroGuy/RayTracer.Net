@@ -59,8 +59,9 @@ namespace RayTracer
         {
             return new NestedPattern(ParentPattern.Clone(), PatternA.Clone(), PatternB.Clone())
             {
-                ColourA = ColourA,
-                ColourB = ColourB
+                ParentPattern = ParentPattern == null ? null : ParentPattern.Clone(),
+                ColourA = ColourA == null ? null : ColourA.Clone(),
+                ColourB = ColourB == null ? null : ColourB.Clone()
             };
         }
     }

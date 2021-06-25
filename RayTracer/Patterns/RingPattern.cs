@@ -14,7 +14,7 @@ namespace RayTracer
 
         public override RingPattern Clone()
         {
-            return new RingPattern(ColourA, ColourB);
+            return new RingPattern(ColourA.Clone(), ColourB.Clone());
         }
     }
 }

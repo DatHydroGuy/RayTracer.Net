@@ -14,7 +14,7 @@ namespace RayTracer
 
         public override StripePattern Clone()
         {
-            return new StripePattern(ColourA, ColourB);
+            return new StripePattern(ColourA.Clone(), ColourB.Clone());
         }
     }
 }

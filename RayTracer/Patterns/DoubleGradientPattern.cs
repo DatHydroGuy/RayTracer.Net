@@ -15,7 +15,7 @@ namespace RayTracer
 
         public override DoubleGradientPattern Clone()
         {
-            return new DoubleGradientPattern(ColourA, ColourB);
+            return new DoubleGradientPattern(ColourA.Clone(), ColourB.Clone());
         }
     }
 }

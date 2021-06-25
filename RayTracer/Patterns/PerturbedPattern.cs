@@ -74,8 +74,8 @@ namespace RayTracer
         {
             return new PerturbedPattern(_patternToPerturb.Clone(), _scale, _octaves, _persistence, _lacunarity)
             {
-                ColourA = ColourA,
-                ColourB = ColourB
+                ColourA = ColourA == null ? null : ColourA.Clone(),
+                ColourB = ColourB == null ? null : ColourB.Clone()
             };
         }
     }

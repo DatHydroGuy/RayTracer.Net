@@ -33,8 +33,8 @@ namespace RayTracer.Tests
             return new TestShape
             {
                 Origin = Origin.Clone(),
-                Material = Material,
-                Transform = Transform,
+                Material = Material.Clone(),
+                Transform = Transform.Clone(),
                 Parent = Parent,
                 SavedRay = SavedRay
             };
