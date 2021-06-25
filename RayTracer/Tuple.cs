@@ -70,6 +70,11 @@ namespace RayTracer
             return (int)(X * 7 + Y * 5 + Z * 3 + W * 2);
         }
 
+        public override string ToString()
+        {
+            return $"[X:{X}, Y:{Y}, Z:{Z}, W:{W}]\n";
+        }
+
         public abstract Tuple Clone();
 
         public double Magnitude()

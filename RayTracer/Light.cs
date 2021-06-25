@@ -52,6 +52,11 @@ namespace RayTracer
             return (int)(Position.GetHashCode() * 3 + Intensity.GetHashCode() * 2);
         }
 
+        public override string ToString()
+        {
+            return $"Light:[Position:{Position.ToString()}Intensity:{Intensity.ToString()}]\n";
+        }
+
         public static Light PointLight(Point position, Colour intensity)
         {
             return new Light(position, intensity);

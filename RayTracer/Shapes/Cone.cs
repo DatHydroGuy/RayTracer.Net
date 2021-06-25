@@ -70,6 +70,14 @@ namespace RayTracer
             };
         }
 
+        public override string ToString()
+        {
+            var closed = Closed ? "true" : "false";
+            var baseStr = base.ToString();
+            var materialIndex = baseStr.IndexOf("\nMaterial:");
+            return $"[{baseStr.Substring(0, materialIndex)}\nRadius:{Radius},Min:{Minimum},Max:{Maximum},Closed:{Closed}{baseStr.Substring(materialIndex)}]";
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             var result = new List<Intersection>();

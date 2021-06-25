@@ -133,5 +133,19 @@ namespace RayTracer.Tests
             Assert.Equal(orig.Green, clone.Green);
             Assert.Equal(orig.Blue, clone.Blue);
         }
+
+        [Fact]
+        public void StringRepresentation()
+        {
+            // Arrange
+            var expected = "[R:0.1, G:0.3, B:0.5]\n";
+            var orig = new Colour(0.1, 0.3, 0.5);
+
+            // Act
+            var result = orig.ToString();
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
     }
 }

@@ -26,6 +26,21 @@ namespace RayTracer
             return currentItems.ToArray();
         }
 
+        public static bool ToStringEquals(string s1, string s2)
+        {
+            var s1WithoutId = CutOutId(s1);
+            var s2WithoutId = CutOutId(s2);
+            return s1WithoutId == s2WithoutId;
+        }
+
+        public static string CutOutId(string s1)
+        {
+            var idStart = s1.IndexOf("\nId:");
+            var idEnd = s1.IndexOf("\n", idStart + 2);
+
+            return s1.Substring(0, idStart) + s1.Substring(idEnd);
+        }
+
         /*
         Solve cubic equations of the form ax^3 + bx^2 + cx + d = 0
         */

@@ -131,7 +131,7 @@ namespace RayTracer
 
         public override string ToString()
         {
-            return $"{Red} {Green} {Blue} ";
+            return $"[R:{Red}, G:{Green}, B:{Blue}]\n";
         }
 
         public Colour Clone()

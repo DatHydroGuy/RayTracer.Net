@@ -73,6 +73,12 @@ namespace RayTracer
             return (int)(ColourA.GetHashCode() * 3 + ColourB.GetHashCode() * 2);
         }
 
+        public override string ToString()
+        {
+            var transform = Transform == null ? "null\n" : Transform.ToString();
+            return $"Type:{GetType()}\nColourA:{ColourA}ColourB:{ColourB}Transform:{transform}";
+        }
+
         public abstract Colour ColourAtPoint(Point targetPoint);
 
         public abstract Pattern Clone();

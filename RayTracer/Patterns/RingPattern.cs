@@ -16,5 +16,10 @@ namespace RayTracer
         {
             return new RingPattern(ColourA.Clone(), ColourB.Clone());
         }
+
+        public override string ToString()
+        {
+            return $"[{base.ToString()}]\n";
+        }
     }
 }

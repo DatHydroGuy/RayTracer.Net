@@ -17,5 +17,10 @@ namespace RayTracer
         {
             return new DoubleGradientPattern(ColourA.Clone(), ColourB.Clone());
         }
+
+        public override string ToString()
+        {
+            return $"[{base.ToString()}]\n";
+        }
     }
 }

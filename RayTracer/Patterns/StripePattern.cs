@@ -16,5 +16,10 @@ namespace RayTracer
         {
             return new StripePattern(ColourA.Clone(), ColourB.Clone());
         }
+
+        public override string ToString()
+        {
+            return $"[{base.ToString()}]\n";
+        }
     }
 }

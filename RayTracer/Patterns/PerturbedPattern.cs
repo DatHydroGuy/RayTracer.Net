@@ -78,5 +78,11 @@ namespace RayTracer
                 ColourB = ColourB == null ? null : ColourB.Clone()
             };
         }
+
+        public override string ToString()
+        {
+            var pattern = PatternToPerturb == null ? "null\n" : PatternToPerturb.ToString();
+            return $"[{base.ToString()}Pattern:{pattern}Scale:{Scale},Oct:{Octaves},Per:{Persistence},Lac:{Lacunarity}]\n";
+        }
     }
 }

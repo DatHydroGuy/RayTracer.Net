@@ -103,6 +103,11 @@ namespace RayTracer
                 return object.ReferenceEquals(t2, null);
             }
 
+            if(object.ReferenceEquals(t2, null))
+            {
+                return false;
+            }
+
             return t1.Equals(t2);
         }
 
@@ -126,6 +131,14 @@ namespace RayTracer
             }
 
             return (int)hashValue;
+        }
+
+        public override string ToString()
+        {
+            return $"[[{Data[0, 0]}, {Data[0, 1]}, {Data[0, 2]}, {Data[0, 3]},\n" +
+                   $"{Data[1, 0]}, {Data[1, 1]}, {Data[1, 2]}, {Data[1, 3]},\n" +
+                   $"{Data[2, 0]}, {Data[2, 1]}, {Data[2, 2]}, {Data[2, 3]},\n" +
+                   $"{Data[3, 0]}, {Data[3, 1]}, {Data[3, 2]}, {Data[3, 3]}]]\n";
         }
 
         public static Matrix operator *(Matrix m1, Matrix m2)

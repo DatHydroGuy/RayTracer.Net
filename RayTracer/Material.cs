@@ -118,6 +118,12 @@ namespace RayTracer
             return (int)(Ambient * 2 + Diffuse * 3 + Specular * 5 + Shininess * 7 + Reflective * 11 + Transparency * 13 + RefractiveIndex * 17 + shadowContrib * 19);
         }
 
+        public override string ToString()
+        {
+            var pattern = Pattern == null ? "null\n" : Pattern.ToString();
+            return $"[Colour:{Colour.ToString()}Amb:{Ambient},Dif:{Diffuse},Spec:{Specular},Shin:{Shininess},Refl:{Reflective},Tran:{Transparency},Refr:{RefractiveIndex},Shad:{CastsShadow},\nPattern:{pattern}]\n";
+        }
+
         public Material Clone()
         {
             return new Material

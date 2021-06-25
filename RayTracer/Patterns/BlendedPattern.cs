@@ -53,5 +53,12 @@ namespace RayTracer
                 ColourB = ColourB == null ? null : ColourB.Clone()
             };
         }
+
+        public override string ToString()
+        {
+            var patA = PatternA == null ? "null\n" : PatternA.ToString();
+            var patB = PatternB == null ? "null\n" : PatternB.ToString();
+            return $"[{base.ToString()}PatternA:{patA}PatternB:{patB}]\n";
+        }
     }
 }
