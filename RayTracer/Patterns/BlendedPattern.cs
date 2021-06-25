@@ -24,11 +24,34 @@ namespace RayTracer
             PatternB = patternB;
         }
 
+        public override bool Equals(object obj)
+        {
+            var other = obj as BlendedPattern;
+
+            return base.Equals(other) &&
+                PatternA == other.PatternA &&
+                PatternB == other.PatternB;
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)(PatternA.GetHashCode() * 5 + PatternB.GetHashCode() * 3 + base.GetHashCode() * 2);
+        }
+
         public override Colour ColourAtPoint(Point targetPoint)
         {
             var patternAPoint = PatternA.TransformInverse * targetPoint;
             var patternBPoint = PatternB.TransformInverse * targetPoint;
             return (PatternA.ColourAtPoint(patternAPoint) + PatternB.ColourAtPoint(patternBPoint)) / 2.0;
+        }
+
+        public override BlendedPattern Clone()
+        {
+            return new BlendedPattern(PatternA.Clone(), PatternB.Clone())
+            {
+                ColourA = ColourA,
+                ColourB = ColourB
+            };
         }
     }
 }

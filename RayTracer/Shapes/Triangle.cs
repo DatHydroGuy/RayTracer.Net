@@ -69,9 +69,9 @@ namespace RayTracer
         {
             return new Triangle(Vertex1, Vertex2, Vertex3)
             {
-                Origin = Origin,
+                Origin = Origin.Clone(),
                 Material = Material,
-                Transform = Transform,
+                Transform = Transform.Clone(),
                 Parent = Parent
             };
         }

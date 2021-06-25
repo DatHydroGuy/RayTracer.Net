@@ -88,5 +88,25 @@ namespace RayTracer.Tests
             Assert.True(result3);
             Assert.True(result4);
         }
+
+        [Fact]
+        public void CloningABlendedPattern()
+        {
+            // Arrange
+            var colourAA = new Colour(0.1, 0.3, 0.5);
+            var colourAB = new Colour(0.2, 0.4, 0.6);
+            var colourBA = new Colour(0.1, 0.4, 0.7);
+            var colourBB = new Colour(0.2, 0.5, 0.8);
+            var patternA = new TestPattern(colourAA, colourAB);
+            var patternB = new TestPattern(colourBA, colourBB);
+            var orig = new BlendedPattern(patternA, patternB);
+
+            // Act
+            var result = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.PatternA, result.PatternA);
+            Assert.Equal(orig.PatternB, result.PatternB);
+        }
     }
 }

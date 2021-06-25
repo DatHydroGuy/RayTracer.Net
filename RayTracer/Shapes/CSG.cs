@@ -93,6 +93,17 @@ namespace RayTracer
             return bounds;
         }
 
+        public override CSG Clone()
+        {
+            return new CSG(Operation, Left, Right)
+            {
+                Origin = Origin,
+                Material = Material.Clone(),
+                Transform = Transform.Clone(),
+                Parent = Parent
+            };
+        }
+
         public bool IntersectionAllowed(bool isLeftObjectHit, bool isInsideLeftObject, bool isInsideRightObject)
         {
             switch (Operation)

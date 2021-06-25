@@ -22,10 +22,11 @@ namespace RayTracer
 
         public override Cube Clone()
         {
-            return new Cube{
-                Origin = Origin,
+            return new Cube
+            {
+                Origin = Origin.Clone(),
                 Material = Material,
-                Transform = Transform,
+                Transform = Transform.Clone(),
                 Parent = Parent
             };
         }

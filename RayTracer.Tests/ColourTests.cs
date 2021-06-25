@@ -119,5 +119,19 @@ namespace RayTracer.Tests
             Assert.Equal(expected, result);
         }
 
+        [Fact]
+        public void CloningAColour()
+        {
+            // Arrange
+            var orig = new Colour(0.2, 0.4, 0.6);
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Red, clone.Red);
+            Assert.Equal(orig.Green, clone.Green);
+            Assert.Equal(orig.Blue, clone.Blue);
+        }
     }
 }

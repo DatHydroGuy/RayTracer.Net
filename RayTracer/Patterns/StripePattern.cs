@@ -11,5 +11,10 @@ namespace RayTracer
         {
             return Math.Floor(targetPoint.X) % 2 == 0 ? ColourA : ColourB;
         }
+
+        public override StripePattern Clone()
+        {
+            return new StripePattern(ColourA, ColourB);
+        }
     }
 }

@@ -44,6 +44,23 @@ namespace RayTracer
             Lacunarity = lacunarity;
         }
 
+        public override bool Equals(object obj)
+        {
+            var other = obj as PerturbedPattern;
+
+            return base.Equals(other) &&
+                PatternToPerturb == other.PatternToPerturb &&
+                Scale == other.Scale &&
+                Octaves == other.Octaves &&
+                Persistence == other.Persistence &&
+                Lacunarity == other.Lacunarity;
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)(PatternToPerturb.GetHashCode() * 13 + Scale.GetHashCode() * 11 + Octaves * 7 + Persistence.GetHashCode() * 5 + Lacunarity.GetHashCode() * 3 + base.GetHashCode() * 2);
+        }
+
         public override Colour ColourAtPoint(Point targetPoint)
         {
             var patternPoint = PatternToPerturb.TransformInverse * targetPoint;
@@ -51,6 +68,15 @@ namespace RayTracer
             var newY = patternPoint.Y + Perlin.Perlin3(patternPoint.X + 1, patternPoint.Y, patternPoint.Z + 1, Octaves, Persistence, Lacunarity) * Scale;
             var newZ = patternPoint.Z + Perlin.Perlin3(patternPoint.X + 1, patternPoint.Y + 1, patternPoint.Z, Octaves, Persistence, Lacunarity) * Scale;
             return PatternToPerturb.ColourAtPoint(new Point(newX, newY, newZ));
+        }
+
+        public override PerturbedPattern Clone()
+        {
+            return new PerturbedPattern(_patternToPerturb.Clone(), _scale, _octaves, _persistence, _lacunarity)
+            {
+                ColourA = ColourA,
+                ColourB = ColourB
+            };
         }
     }
 }

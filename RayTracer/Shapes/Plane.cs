@@ -22,10 +22,11 @@ namespace RayTracer
 
         public override Plane Clone()
         {
-            return new Plane{
-                Origin = Origin,
+            return new Plane
+            {
+                Origin = Origin.Clone(),
                 Material = Material,
-                Transform = Transform,
+                Transform = Transform.Clone(),
                 Parent = Parent
             };
         }

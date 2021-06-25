@@ -43,7 +43,39 @@ namespace RayTracer
             Transform = Matrix.Identity(4);
         }
 
+        public override bool Equals(object obj)
+        {
+            var other = obj as Pattern;
+
+            return other != null &&
+                ColourA == other.ColourA &&
+                ColourB == other.ColourB;
+        }
+
+        public static bool operator==(Pattern t1, Pattern t2)
+        {
+            // If any nulls are passed in, then both arguments must be null for equality
+            if(object.ReferenceEquals(t1, null))
+            {
+                return object.ReferenceEquals(t2, null);
+            }
+
+            return t1.Equals(t2);
+        }
+
+        public static bool operator!=(Pattern t1, Pattern t2)
+        {
+            return !(t1 == t2);
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)(ColourA.GetHashCode() * 3 + ColourB.GetHashCode() * 2);
+        }
+
         public abstract Colour ColourAtPoint(Point targetPoint);
+
+        public abstract Pattern Clone();
 
         public Colour ColourAtShape(Shape obj, Point targetPoint)
         {

@@ -42,9 +42,9 @@ namespace RayTracer
         {
             var groupClone = new Group
             {
-                Origin = Origin,//.Clone(),
+                Origin = Origin.Clone(),
                 Parent = Parent,
-                Transform = Transform//.Clone()
+                Transform = Transform.Clone()
             };
             groupClone.AddChildren(Shapes.Select(shape => shape.Clone()));
             groupClone.SetMaterial(Material);

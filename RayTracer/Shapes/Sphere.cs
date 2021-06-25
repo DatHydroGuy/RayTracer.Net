@@ -32,10 +32,11 @@ namespace RayTracer
 
         public override Sphere Clone()
         {
-            return new Sphere{
-                Origin = Origin,
+            return new Sphere
+            {
+                Origin = Origin.Clone(),
                 Material = Material,
-                Transform = Transform,
+                Transform = Transform.Clone(),
                 Parent = Parent,
                 Radius = Radius
             };

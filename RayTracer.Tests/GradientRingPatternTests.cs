@@ -37,5 +37,20 @@ namespace RayTracer.Tests
             Assert.Equal(new Colour(0.5, 0.5, 0.5), pattern.ColourAtPoint(new Point(-3 * val, 0, -3 * val)));
             Assert.Equal(new Colour(0.5, 0.5, 0.5), pattern.ColourAtPoint(new Point(5 * val, 0, 5 * val)));
         }
-    }
+
+        [Fact]
+        public void CloningAGradientRingPattern()
+        {
+            // Arrange
+            var colourA = new Colour(0.1, 0.3, 0.5);
+            var colourB = new Colour(0.2, 0.4, 0.6);
+            var orig = new GradientRingPattern(colourA, colourB);
+
+            // Act
+            var result = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.ColourA, result.ColourA);
+            Assert.Equal(orig.ColourB, result.ColourB);
+        }    }
 }

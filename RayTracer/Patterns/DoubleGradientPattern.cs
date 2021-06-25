@@ -12,5 +12,10 @@ namespace RayTracer
             var fraction = 1 - Math.Abs((targetPoint.X - Math.Floor(targetPoint.X) - 0.5) * 2);
             return ColourA + (ColourB - ColourA) * fraction;
         }
+
+        public override DoubleGradientPattern Clone()
+        {
+            return new DoubleGradientPattern(ColourA, ColourB);
+        }
     }
 }

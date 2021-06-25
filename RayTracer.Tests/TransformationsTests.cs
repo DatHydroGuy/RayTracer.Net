@@ -406,5 +406,26 @@ namespace RayTracer.Tests
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Fact]
+        public void CloningATransformation()
+        {
+            // Arrange
+            var orig = Transformations.Translation(1.2, 2.3, 3.4) * Transformations.Scaling(0.9, 0.8, 0.7) * Transformations.Shearing(9.8, 8.7, 7.6, 6.5, 5.4, 4.3) * Transformations.RotationX(-11.3);
+
+            // Act
+            var result = orig.Clone();
+
+            // Assert
+            var allEqual = true;
+            for (int y = 0; y < 4; y++)
+            {
+                for (int x = 0; x < 4; x++)
+                {
+                    allEqual &= orig.Data[y, x] == result.Data[y, x];
+                }
+            }
+            Assert.True(allEqual);
+        }
     }
 }

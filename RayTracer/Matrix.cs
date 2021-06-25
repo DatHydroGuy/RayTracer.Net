@@ -192,6 +192,16 @@ namespace RayTracer
             return m;
         }
 
+        public Matrix Clone()
+        {
+            return new Matrix(
+                Data[0, 0], Data[0, 1], Data[0, 2], Data[0, 3],
+                Data[1, 0], Data[1, 1], Data[1, 2], Data[1, 3],
+                Data[2, 0], Data[2, 1], Data[2, 2], Data[2, 3], 
+                Data[3, 0], Data[3, 1], Data[3, 2], Data[3, 3]
+            );
+        }
+
         public Matrix Transpose()
         {
             var m = new Matrix(Height, Width);

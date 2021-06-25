@@ -92,7 +92,8 @@ namespace RayTracer
                 Utilities.AlmostEqual(Reflective, other.Reflective) &&
                 Utilities.AlmostEqual(Transparency, other.Transparency) &&
                 Utilities.AlmostEqual(RefractiveIndex, other.RefractiveIndex) &&
-                CastsShadow == other.CastsShadow;
+                CastsShadow == other.CastsShadow &&
+                Pattern == other.Pattern;
         }
 
         public static bool operator==(Material m1, Material m2)
@@ -115,6 +116,23 @@ namespace RayTracer
         {
             int shadowContrib = CastsShadow ? 1 : -1;
             return (int)(Ambient * 2 + Diffuse * 3 + Specular * 5 + Shininess * 7 + Reflective * 11 + Transparency * 13 + RefractiveIndex * 17 + shadowContrib * 19);
+        }
+
+        public Material Clone()
+        {
+            return new Material
+            {
+                Colour = Colour.Clone(),
+                Ambient = Ambient,
+                Diffuse = Diffuse,
+                Specular = Specular,
+                Shininess = Shininess,
+                Reflective = Reflective,
+                Transparency = Transparency,
+                RefractiveIndex = RefractiveIndex,
+                CastsShadow = CastsShadow,
+                Pattern = Pattern == null ? null : Pattern.Clone()
+            };
         }
 
         public Colour Lighting(Shape obj, Light light, Point targetPoint, Vector eyeVector, Vector normalVector, bool isInShadow = false)

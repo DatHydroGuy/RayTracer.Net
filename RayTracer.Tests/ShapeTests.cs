@@ -30,8 +30,9 @@ namespace RayTracer.Tests
 
         public override TestShape Clone()
         {
-            return new TestShape{
-                Origin = Origin,
+            return new TestShape
+            {
+                Origin = Origin.Clone(),
                 Material = Material,
                 Transform = Transform,
                 Parent = Parent,

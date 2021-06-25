@@ -31,6 +31,21 @@ namespace RayTracer
             PatternB = patternB;
         }
 
+        public override bool Equals(object obj)
+        {
+            var other = obj as NestedPattern;
+
+            return base.Equals(other) &&
+                ParentPattern == other.ParentPattern &&
+                PatternA == other.PatternA &&
+                PatternB == other.PatternB;
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)(ParentPattern.GetHashCode() * 7 + PatternA.GetHashCode() * 5 + PatternB.GetHashCode() * 3 + base.GetHashCode() * 2);
+        }
+
         public override Colour ColourAtPoint(Point targetPoint)
         {
             var patternPoint = ParentPattern.TransformInverse * targetPoint;
@@ -38,6 +53,15 @@ namespace RayTracer
             var patternAPoint = PatternA.TransformInverse * targetPoint;
             var patternBPoint = PatternB.TransformInverse * targetPoint;
             return parentPatternPoint == ParentPattern.ColourA ? PatternA.ColourAtPoint(patternAPoint) : PatternB.ColourAtPoint(patternBPoint);
+        }
+
+        public override NestedPattern Clone()
+        {
+            return new NestedPattern(ParentPattern.Clone(), PatternA.Clone(), PatternB.Clone())
+            {
+                ColourA = ColourA,
+                ColourB = ColourB
+            };
         }
     }
 }

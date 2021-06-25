@@ -183,5 +183,53 @@ namespace RayTracer.Tests
             // Assert
             Assert.Equal(1.0, m.RefractiveIndex);
         }
+
+        [Fact]
+        public void CloningAMaterial()
+        {
+            // Arrange
+            var orig = new Material();
+
+            // Act
+            var result = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Colour, result.Colour);
+            Assert.Equal(orig.Ambient, result.Ambient);
+            Assert.Equal(orig.Diffuse, result.Diffuse);
+            Assert.Equal(orig.Specular, result.Specular);
+            Assert.Equal(orig.Shininess, result.Shininess);
+            Assert.Equal(orig.Reflective, result.Reflective);
+            Assert.Equal(orig.Transparency, result.Transparency);
+            Assert.Equal(orig.RefractiveIndex, result.RefractiveIndex);
+            Assert.Equal(orig.CastsShadow, result.CastsShadow);
+            Assert.Equal(orig.Pattern, result.Pattern);
+        }
+
+        [Fact]
+        public void CloningAMaterialWithAPattern()
+        {
+            // Arrange
+            var colourA = new Colour(0.1, 0.3, 0.5);
+            var colourB = new Colour(0.2, 0.4, 0.6);
+            var pattern = new TestPattern(colourA, colourB);
+            var orig = new Material();
+            orig.Pattern = pattern;
+
+            // Act
+            var result = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Colour, result.Colour);
+            Assert.Equal(orig.Ambient, result.Ambient);
+            Assert.Equal(orig.Diffuse, result.Diffuse);
+            Assert.Equal(orig.Specular, result.Specular);
+            Assert.Equal(orig.Shininess, result.Shininess);
+            Assert.Equal(orig.Reflective, result.Reflective);
+            Assert.Equal(orig.Transparency, result.Transparency);
+            Assert.Equal(orig.RefractiveIndex, result.RefractiveIndex);
+            Assert.Equal(orig.CastsShadow, result.CastsShadow);
+            Assert.Equal(orig.Pattern, result.Pattern);
+        }
     }
 }

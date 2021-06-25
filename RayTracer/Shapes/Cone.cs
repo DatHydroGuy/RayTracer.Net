@@ -59,9 +59,9 @@ namespace RayTracer
         {
             return new Cone
             {
-                Origin = Origin,
+                Origin = Origin.Clone(),
                 Material = Material,
-                Transform = Transform,
+                Transform = Transform.Clone(),
                 Parent = Parent,
                 Radius = Radius,
                 Minimum = Minimum,

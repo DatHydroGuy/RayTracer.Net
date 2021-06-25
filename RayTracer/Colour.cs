@@ -133,5 +133,10 @@ namespace RayTracer
         {
             return $"{Red} {Green} {Blue} ";
         }
+
+        public Colour Clone()
+        {
+            return new Colour(Red, Green, Blue);
+        }
     }
 }

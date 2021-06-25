@@ -11,6 +11,11 @@ namespace RayTracer.Tests
         {
             return new Colour(targetPoint.X, targetPoint.Y, targetPoint.Z);
         }
+
+        public override Pattern Clone()
+        {
+            return new TestPattern(ColourA, ColourB);
+        }
     }
 
     public class PatternTests
@@ -88,6 +93,23 @@ namespace RayTracer.Tests
 
             // Assert
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void CloningAPattern()
+        {
+            // Arrange
+            var colourA = new Colour(0.1, 0.3, 0.5);
+            var colourB = new Colour(0.2, 0.4, 0.6);
+            var orig = new TestPattern(colourA, colourB);
+
+            // Act
+            var result = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.ColourA, result.ColourA);
+            Assert.Equal(orig.ColourB, result.ColourB);
+            Assert.Equal(orig, result);
         }
     }
 }

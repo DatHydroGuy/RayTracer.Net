@@ -11,5 +11,10 @@ namespace RayTracer
         {
             return (Math.Floor(targetPoint.X) + Math.Floor(targetPoint.Y) + Math.Floor(targetPoint.Z)) % 2 == 0 ? ColourA : ColourB;
         }
+
+        public override CheckerPattern Clone()
+        {
+            return new CheckerPattern(ColourA, ColourB);
+        }
     }
 }

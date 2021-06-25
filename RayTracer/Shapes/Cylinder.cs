@@ -57,10 +57,11 @@ namespace RayTracer
 
         public override Cylinder Clone()
         {
-            return new Cylinder{
-                Origin = Origin,
+            return new Cylinder
+            {
+                Origin = Origin.Clone(),
                 Material = Material,
-                Transform = Transform,
+                Transform = Transform.Clone(),
                 Parent = Parent,
                 Radius = Radius,
                 Minimum = Minimum,

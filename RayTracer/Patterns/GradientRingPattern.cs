@@ -14,5 +14,10 @@ namespace RayTracer
             var fraction = pointDistance - Math.Floor(pointDistance);
             return ColourA + distance * fraction;
         }
+
+        public override GradientRingPattern Clone()
+        {
+            return new GradientRingPattern(ColourA, ColourB);
+        }
     }
 }

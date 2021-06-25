@@ -11,5 +11,10 @@ namespace RayTracer
         {
             return Math.Floor(Math.Sqrt(targetPoint.X * targetPoint.X + targetPoint.Z * targetPoint.Z)) % 2 == 0 ? ColourA : ColourB;
         }
+
+        public override RingPattern Clone()
+        {
+            return new RingPattern(ColourA, ColourB);
+        }
     }
 }

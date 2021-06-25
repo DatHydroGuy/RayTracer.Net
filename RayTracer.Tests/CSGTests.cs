@@ -243,5 +243,28 @@ namespace RayTracer.Tests
             Assert.Single(rightSubGroup2.Shapes);
             Assert.Equal(s4, rightSubGroup2.Shapes[0]);
         }
+
+        [Fact]
+        public void CloningACSG()
+        {
+            // Arrange
+            var left = new TestShape();
+            var right = new TestShape();
+            var orig = new CSG(CsgOperation.Difference, left, right);
+
+            // Act
+            var result = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.AABB, result.AABB);
+            Assert.Equal(orig.Left, result.Left);
+            Assert.Equal(orig.Material, result.Material);
+            Assert.Equal(orig.Operation, result.Operation);
+            Assert.Equal(orig.Origin, result.Origin);
+            Assert.Equal(orig.Parent, result.Parent);
+            Assert.Equal(orig.Right, result.Right);
+            Assert.Equal(orig.Shapes, result.Shapes);
+            Assert.Equal(orig.Transform, result.Transform);
+        }
     }
 }
