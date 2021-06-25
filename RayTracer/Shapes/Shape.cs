@@ -63,6 +63,8 @@ namespace RayTracer
                 Material == other.Material;
         }
 
+        public abstract Shape Clone();
+
         public static bool operator==(Shape t1, Shape t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
@@ -82,6 +84,11 @@ namespace RayTracer
         public override int GetHashCode()
         {
             return (int)(Origin.GetHashCode() * 5 + Transform.GetHashCode() * 3 + Material.GetHashCode() * 2);
+        }
+
+        public override string ToString()
+        {
+            return $"Id: {_id}\nOrigin: {Origin}\nParent: {Parent}\nMaterial: {Material}\nTransform: {Transform}";
         }
 
         public Intersection[] Intersects(Ray ray)
@@ -185,18 +192,10 @@ namespace RayTracer
                         asGroup.CreateSubgroup(right.Shapes);
                 }
 
-                // foreach (var childGroup in asGroup.Shapes)
-                // {
-                //     Shape.Divide(childGroup, threshold);
-                // }
                 Parallel.ForEach(asGroup.Shapes, childGroup =>
                 {
                     Shape.Divide(childGroup, threshold);
                 });
-            }
-            else
-            {
-                // Do nothing to primitive shapes
             }
         }
     }

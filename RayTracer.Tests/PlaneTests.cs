@@ -99,5 +99,21 @@ namespace RayTracer.Tests
             Assert.True(double.IsPositiveInfinity(boundingBox.MaxPoint.Y));
             Assert.True(double.IsPositiveInfinity(boundingBox.MaxPoint.Z));
         }
+
+        [Fact]
+        public void CloningAPlane()
+        {
+            // Arrange
+            var orig = new Plane();
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Origin, clone.Origin);
+            Assert.Equal(orig.Material, clone.Material);
+            Assert.Equal(orig.Transform, clone.Transform);
+            Assert.Equal(orig.Parent, clone.Parent);
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace RayTracer
 
         public override bool Equals(object obj)
         {
-            var other = obj as Cube;
+            var other = obj as Group;
 
             return base.Equals(other);
         }
@@ -36,6 +36,19 @@ namespace RayTracer
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        public override Group Clone()
+        {
+            var groupClone = new Group
+            {
+                Origin = Origin,//.Clone(),
+                Parent = Parent,
+                Transform = Transform//.Clone()
+            };
+            groupClone.AddChildren(Shapes.Select(shape => shape.Clone()));
+            groupClone.SetMaterial(Material);
+            return groupClone;
         }
 
         public override Intersection[] LocalIntersects(Ray ray)

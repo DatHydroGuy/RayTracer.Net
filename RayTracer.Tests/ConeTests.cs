@@ -219,5 +219,25 @@ namespace RayTracer.Tests
             Assert.Equal(new Point(-5, -5, -5), boundingBox.MinPoint);
             Assert.Equal(new Point(5, 3, 5), boundingBox.MaxPoint);
         }
+
+        [Fact]
+        public void CloningACone()
+        {
+            // Arrange
+            var orig = new Cone();
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Origin, clone.Origin);
+            Assert.Equal(orig.Material, clone.Material);
+            Assert.Equal(orig.Transform, clone.Transform);
+            Assert.Equal(orig.Parent, clone.Parent);
+            Assert.Equal(orig.Radius, clone.Radius);
+            Assert.Equal(orig.Minimum, clone.Minimum);
+            Assert.Equal(orig.Maximum, clone.Maximum);
+            Assert.Equal(orig.Closed, clone.Closed);
+        }
     }
 }

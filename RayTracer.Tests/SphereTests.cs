@@ -222,5 +222,22 @@ namespace RayTracer.Tests
             Assert.Equal(new Point(-1, -1, -1), boundingBox.MinPoint);
             Assert.Equal(new Point(1, 1, 1), boundingBox.MaxPoint);
         }
+
+        [Fact]
+        public void CloningASphere()
+        {
+            // Arrange
+            var orig = new Sphere();
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Origin, clone.Origin);
+            Assert.Equal(orig.Material, clone.Material);
+            Assert.Equal(orig.Transform, clone.Transform);
+            Assert.Equal(orig.Parent, clone.Parent);
+            Assert.Equal(orig.Radius, clone.Radius);
+        }
     }
 }

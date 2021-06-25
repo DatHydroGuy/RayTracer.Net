@@ -27,6 +27,22 @@ namespace RayTracer.Tests
         {
             return new BoundingBox(new Point(-1, -1, -1), new Point(1, 1, 1));
         }
+
+        public override TestShape Clone()
+        {
+            return new TestShape{
+                Origin = Origin,
+                Material = Material,
+                Transform = Transform,
+                Parent = Parent,
+                SavedRay = SavedRay
+            };
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $"\nSavedRay: {SavedRay}";
+        }
     }
 
     public class ShapeTests
@@ -269,6 +285,37 @@ namespace RayTracer.Tests
 
             // Assert
             Assert.IsType<Sphere>(s);
+        }
+
+        [Fact]
+        public void CloningAShape()
+        {
+            // Arrange
+            var orig = new TestShape();
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Origin, clone.Origin);
+            Assert.Equal(orig.Material, clone.Material);
+            Assert.Equal(orig.Transform, clone.Transform);
+            Assert.Equal(orig.Parent, clone.Parent);
+            Assert.Equal(orig.SavedRay, clone.SavedRay);
+        }
+
+        [Fact]
+        public void StringRepresentation()
+        {
+            // Arrange
+            var expected = "Id: 0\nOrigin: [0, 0, 0]\nParent: null\nMaterial: m\nTransform: t\nSavedRay: false";
+            var orig = new TestShape();
+
+            // Act
+            var result = orig.ToString();
+
+            // Assert
+            Assert.Equal(expected, result);
         }
     }
 }

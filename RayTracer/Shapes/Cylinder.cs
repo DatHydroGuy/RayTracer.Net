@@ -31,7 +31,6 @@ namespace RayTracer
             set { _closed = value; }
         }
         
-
         public Cylinder(): base()
         {
             Radius = 1.0;
@@ -54,6 +53,20 @@ namespace RayTracer
         {
             int closedHash = Closed ? 1 : -1;
             return (int)(base.GetHashCode() + Radius * 11 + closedHash * 13);     // Not including min and max because the infinities might break the hashing!
+        }
+
+        public override Cylinder Clone()
+        {
+            return new Cylinder{
+                Origin = Origin,
+                Material = Material,
+                Transform = Transform,
+                Parent = Parent,
+                Radius = Radius,
+                Minimum = Minimum,
+                Maximum = Maximum,
+                Closed = Closed
+            };
         }
 
         public override Intersection[] LocalIntersects(Ray ray)

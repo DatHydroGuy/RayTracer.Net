@@ -20,6 +20,16 @@ namespace RayTracer
             return base.GetHashCode();
         }
 
+        public override Cube Clone()
+        {
+            return new Cube{
+                Origin = Origin,
+                Material = Material,
+                Transform = Transform,
+                Parent = Parent
+            };
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             double xTMin, xTMax, yTMin, yTMax, zTMin, zTMax;

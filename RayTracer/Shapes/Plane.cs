@@ -20,6 +20,16 @@ namespace RayTracer
             return base.GetHashCode();
         }
 
+        public override Plane Clone()
+        {
+            return new Plane{
+                Origin = Origin,
+                Material = Material,
+                Transform = Transform,
+                Parent = Parent
+            };
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             if (Math.Abs(ray.Direction.Y) < Utilities.EPSILON)

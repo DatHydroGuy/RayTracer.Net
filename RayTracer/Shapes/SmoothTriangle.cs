@@ -83,6 +83,17 @@ namespace RayTracer
                          7 * Normal1.GetHashCode() + 11 * Normal2.GetHashCode() + 13 * Normal3.GetHashCode());
         }
 
+        public override SmoothTriangle Clone()
+        {
+            return new SmoothTriangle(Vertex1, Vertex2, Vertex3, Normal1, Normal2, Normal3)
+            {
+                Origin = Origin,
+                Material = Material,
+                Transform = Transform,
+                Parent = Parent
+            };
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             var rayCrossEdge2 = ray.Direction.Cross(Edge2);

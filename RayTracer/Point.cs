@@ -81,5 +81,10 @@ namespace RayTracer
                 Z = p1.Z / d
             };
         }
+
+        public override Point Clone()
+        {
+            return new Point(X, Y, Z, W);
+        }
     }
 }

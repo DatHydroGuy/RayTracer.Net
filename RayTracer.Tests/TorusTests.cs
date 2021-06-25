@@ -313,5 +313,25 @@
 //             // Assert
 //             Assert.IsAssignableFrom<Shape>(s);
 //         }
+
+        // [Fact]
+        // public void CloningATorus()
+        // {
+        //     // Arrange
+        //     var minRadius = 1.2;
+        //     var maxRadius = 3.4;
+        //     var orig = new Torus(minRadius, maxRadius);
+
+        //     // Act
+        //     var clone = orig.Clone();
+
+        //     // Assert
+        //     Assert.Equal(orig.Origin, clone.Origin);
+        //     Assert.Equal(orig.Material, clone.Material);
+        //     Assert.Equal(orig.Transform, clone.Transform);
+        //     Assert.Equal(orig.Parent, clone.Parent);
+        //     Assert.Equal(orig.MinRadius, clone.MinRadius);
+        //     Assert.Equal(orig.MaxRadius, clone.MaxRadius);
+        // }
 //     }
 // }

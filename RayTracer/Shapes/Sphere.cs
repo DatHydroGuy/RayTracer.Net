@@ -30,6 +30,17 @@ namespace RayTracer
             return (int)(Radius * 7 + base.GetHashCode());
         }
 
+        public override Sphere Clone()
+        {
+            return new Sphere{
+                Origin = Origin,
+                Material = Material,
+                Transform = Transform,
+                Parent = Parent,
+                Radius = Radius
+            };
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             var sphereToRay = ray.Origin - Origin;   // origin should always be Point(0, 0, 0)

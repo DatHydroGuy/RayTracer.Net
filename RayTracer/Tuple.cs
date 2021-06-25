@@ -70,6 +70,8 @@ namespace RayTracer
             return (int)(X * 7 + Y * 5 + Z * 3 + W * 2);
         }
 
+        public abstract Tuple Clone();
+
         public double Magnitude()
         {
             return Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
@@ -79,6 +81,5 @@ namespace RayTracer
         {
             return X * t.X + Y * t.Y + Z * t.Z + W * t.W;
         }
-
     }
 }

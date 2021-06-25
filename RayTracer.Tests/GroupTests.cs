@@ -389,5 +389,22 @@ namespace RayTracer.Tests
             Assert.Equal(s2, subSubGroup2.Shapes[0]);
             Assert.Equal(s3, subSubGroup2.Shapes[1]);
         }
+
+        [Fact]
+        public void CloningAGroup()
+        {
+            // Arrange
+            var orig = new Group();
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Origin, clone.Origin);
+            Assert.Equal(orig.Material, clone.Material);
+            Assert.Equal(orig.Transform, clone.Transform);
+            Assert.Equal(orig.Parent, clone.Parent);
+            Assert.Equal(orig.Shapes, clone.Shapes);
+        }
     }
 }

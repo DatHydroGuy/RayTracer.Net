@@ -62,6 +62,11 @@ namespace RayTracer
             };
         }
 
+        public override Vector Clone()
+        {
+            return new Vector(X, Y, Z, W);
+        }
+
         public Vector Normalise()
         {
             return this / Magnitude();

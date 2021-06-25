@@ -129,5 +129,29 @@ namespace RayTracer.Tests
             Assert.Single(xs);
             Assert.Equal(2, xs[0].T);
         }
+
+        [Fact]
+        public void CloningATriangle()
+        {
+            // Arrange
+            var p1 = new Point(1, 2, 3);
+            var p2 = new Point(2, 3, 4);
+            var p3 = new Point(3, 4, 5);
+            var orig = new Triangle(p1, p2, p3);
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.Origin, clone.Origin);
+            Assert.Equal(orig.Material, clone.Material);
+            Assert.Equal(orig.Transform, clone.Transform);
+            Assert.Equal(orig.Parent, clone.Parent);
+            Assert.Equal(orig.Vertex1, clone.Vertex1);
+            Assert.Equal(orig.Vertex2, clone.Vertex2);
+            Assert.Equal(orig.Vertex3, clone.Vertex3);
+            Assert.Equal(orig.Edge1, clone.Edge1);
+            Assert.Equal(orig.Edge2, clone.Edge2);
+        }
     }
 }

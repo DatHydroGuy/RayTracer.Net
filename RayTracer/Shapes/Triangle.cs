@@ -65,6 +65,17 @@ namespace RayTracer
             return (int)(base.GetHashCode() + 2 * Vertex1.GetHashCode() + 3 * Vertex2.GetHashCode() + 5 * Vertex3.GetHashCode());
         }
 
+        public override Triangle Clone()
+        {
+            return new Triangle(Vertex1, Vertex2, Vertex3)
+            {
+                Origin = Origin,
+                Material = Material,
+                Transform = Transform,
+                Parent = Parent
+            };
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             var rayCrossEdge2 = ray.Direction.Cross(Edge2);

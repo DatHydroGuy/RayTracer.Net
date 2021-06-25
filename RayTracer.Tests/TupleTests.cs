@@ -349,5 +349,37 @@ namespace RayTracer.Tests
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Fact]
+        public void CloningAPoint()
+        {
+            // Arrange
+            var orig = new Point(1.2, 2.3, 3.4);
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.X, clone.X);
+            Assert.Equal(orig.Y, clone.Y);
+            Assert.Equal(orig.Z, clone.Z);
+            Assert.Equal(orig.W, clone.W);
+        }
+
+        [Fact]
+        public void CloningAVector()
+        {
+            // Arrange
+            var orig = new Vector(1.2, 2.3, 3.4);
+
+            // Act
+            var clone = orig.Clone();
+
+            // Assert
+            Assert.Equal(orig.X, clone.X);
+            Assert.Equal(orig.Y, clone.Y);
+            Assert.Equal(orig.Z, clone.Z);
+            Assert.Equal(orig.W, clone.W);
+        }
     }
 }

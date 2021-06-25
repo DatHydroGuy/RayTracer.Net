@@ -41,6 +41,17 @@ namespace RayTracer
             return (int)(MajorRadius * 11 + MinorRadius * 7 + base.GetHashCode());
         }
 
+        public override Torus Clone()
+        {
+            return new Torus(MajorRadius, MinorRadius)
+            {
+                Origin = Origin,
+                Material = Material,
+                Transform = Transform,
+                Parent = Parent
+            };
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             // var torusToRay = ray.Origin - Origin;   // origin should always be Point(0, 0, 0)       // centerToRayOrigin 
