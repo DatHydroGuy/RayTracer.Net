@@ -51,6 +51,19 @@ namespace RayTracer
             return groupClone;
         }
 
+        public override string ToString()
+        {
+            var parent = Parent == null ? "null" : Parent._id.ToString();
+            var currGroup = $"Type:{GetType()}, Origin:{Origin}Parent:{parent}\nMaterial:{Material}Transform:{Transform}Children:\n";
+            var children = "";
+            foreach (var shape in Shapes)
+            {
+                children += shape.ToString() + "\n";
+            }
+
+            return currGroup + children;
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             if (AABB == null)

@@ -88,10 +88,10 @@ namespace RayTracer
 
         public override string ToString()
         {
-            var parent = Parent == null ? "null\n" : Parent.ToString();
+            var parent = Parent == null ? "null" : Parent._id.ToString();
             var material = Material == null ? "null\n" : Material.ToString();
             var transform = Transform == null ? "null\n" : Transform.ToString();
-            return $"Type:{GetType()}\nId:{_id}\nOrigin:{Origin}Parent:{parent}Material:{material}Transform:{transform}";
+            return $"Type:{GetType()}\nId:{_id}\nOrigin:{Origin}Parent:{parent}\nMaterial:{material}Transform:{transform}";
         }
 
         public Intersection[] Intersects(Ray ray)

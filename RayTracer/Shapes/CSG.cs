@@ -104,6 +104,31 @@ namespace RayTracer
             };
         }
 
+        public override string ToString()
+        {
+            string op = "";
+            switch (Operation)
+            {
+                case CsgOperation.Union:
+                    op = "Union";
+                    break;
+                case CsgOperation.Difference:
+                    op = "Difference";
+                    break;
+                case CsgOperation.Intersect:
+                    op = "Intersect";
+                    break;
+                default:
+                    op = "None";
+                    break;
+            }
+            // var left = Left == null ? "null" : Left.ToString();
+            // var right = Right == null ? "null" : Right.ToString();
+            var baseStr = base.ToString();
+            var materialIndex = baseStr.IndexOf("\nMaterial:");
+            return $"[{baseStr.Substring(0, materialIndex)}\nOp:{op}{baseStr.Substring(materialIndex)}]";
+        }
+
         public bool IntersectionAllowed(bool isLeftObjectHit, bool isInsideLeftObject, bool isInsideRightObject)
         {
             switch (Operation)

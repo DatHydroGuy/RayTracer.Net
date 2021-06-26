@@ -31,6 +31,12 @@ namespace RayTracer
             };
         }
 
+        public override string ToString()
+        {
+            var baseStr = base.ToString();
+            return $"[{baseStr}]";
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             double xTMin, xTMax, yTMin, yTMax, zTMin, zTMax;

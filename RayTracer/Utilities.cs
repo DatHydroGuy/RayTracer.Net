@@ -28,17 +28,35 @@ namespace RayTracer
 
         public static bool ToStringEquals(string s1, string s2)
         {
-            var s1WithoutId = CutOutId(s1);
-            var s2WithoutId = CutOutId(s2);
+            var s1WithoutId = CutOutStrings(s1, "\nId:");
+            s1WithoutId = CutOutStrings(s1WithoutId, "\nParent:");
+            var s2WithoutId = CutOutStrings(s2, "\nId:");
+            s2WithoutId = CutOutStrings(s2WithoutId, "\nParent:");
             return s1WithoutId == s2WithoutId;
         }
 
-        public static string CutOutId(string s1)
+        public static string CutOutStrings(string s, string stringToCut)
         {
-            var idStart = s1.IndexOf("\nId:");
-            var idEnd = s1.IndexOf("\n", idStart + 2);
+            var sOld = "";
+            var sNew = s;
+            do
+            {
+                sOld = sNew;
+                sNew = CutOutString(sOld, stringToCut);
+            } while (sOld.Length != sNew.Length);
 
-            return s1.Substring(0, idStart) + s1.Substring(idEnd);
+            return sNew;
+        }
+
+        public static string CutOutString(string s, string stringToCut)
+        {
+            var idStart = s.IndexOf(stringToCut);
+            if (idStart < 0)
+                return s;
+
+            var idEnd = s.IndexOf("\n", idStart + 2);
+
+            return s.Substring(0, idStart) + s.Substring(idEnd);
         }
 
         /*
