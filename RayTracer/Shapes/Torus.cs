@@ -52,6 +52,13 @@ namespace RayTracer
             };
         }
 
+        public override string ToString()
+        {
+            var baseStr = base.ToString();
+            var materialIndex = baseStr.IndexOf("\nMaterial:");
+            return $"[{baseStr.Substring(0, materialIndex)}\nMinorRadius:{MinorRadius},MajorRadius:{MajorRadius}\n{baseStr.Substring(materialIndex + 1)}]";
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             // var torusToRay = ray.Origin - Origin;   // origin should always be Point(0, 0, 0)       // centerToRayOrigin 

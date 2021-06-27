@@ -101,14 +101,26 @@ namespace RayTracerApp
                     case "value":
                         switch (definitionValue)
                         {
-                            // case Group tempGroup:
-                            //     System.Console.WriteLine(tempGroup);
-                            //     break;
                             case Dictionary<object, object> tempObject:
                                 var (firstKey, firstValue) = tempObject.First();
                                 if (firstKey.ToString() == "add" && firstValue.ToString() == "group")
                                 {
-                                    DefineGroup(name, tempObject);
+                                    // Need to unpack tempObject and then pass it into ProcessShape()
+                                    var g = new Group();
+                                    var childData = (List<object>) tempObject.Values.Last();
+                                    foreach (var childDictionary in childData)
+                                    {
+                                        var arguments = new List<KeyValuePair<string, object>>();
+
+                                        foreach (var (tempKey, tempValue) in (Dictionary<object, object>) childDictionary)
+                                        {
+                                            arguments.Add(new KeyValuePair<string, object>(tempKey.ToString(), tempValue));
+                                        }
+
+                                        var s = ProcessShape(arguments);
+                                        g.AddChild(s);
+                                    }
+                                    _groupDefinitions.Add(name, g);
                                 }
                                 else
                                 {
@@ -149,19 +161,6 @@ namespace RayTracerApp
             _transformDefinitions.Add(name, transformValuesList);
         }
 
-        private void DefineGroup(string name, Dictionary<object, object> groupObject)
-        {
-            var group = new Group();
-            var children = (List<object>)groupObject.Last().Value;
-            foreach (var child in children)
-            {
-                var typedChild = (Dictionary<object, object>) child;
-                var sdg = typedChild.Select(pair => new KeyValuePair<string, object>(pair.Key.ToString(), pair.Value)).ToList();
-                group.AddChild(ProcessShape(sdg.ToList()));
-            }
-            _groupDefinitions.Add(name, group);
-        }
-
         private void LookupExtendItem(string definitionKey, object definitionValue, string name,
                                       ref Dictionary<object, object> materialValuesList, ref List<object> transformValuesList)
         {
@@ -192,31 +191,12 @@ namespace RayTracerApp
                 case "smooth-triangle":
                     world.AddShapeToWorld(ProcessShape(item.ToList()));
                     break;
-                default:
-                    // Need to check if we have a group name
-                    if (CheckGroups(item.Values.First().ToString()) is Group group)
-                    {
-                        AddGroupToWorld(world, group);
-                    }
+                case "group":
+                    world.AddShapeToWorld(ProcessShape(item.Skip(1).ToList()));
                     break;
-            }
-        }
-
-        private void ProcessGroup(Group group)
-        {
-        }
-
-        private void AddGroupToWorld(World world, Group group)
-        {
-            foreach (var child in group.Shapes)
-            {
-                if (child is Group subGroup)
-                    AddGroupToWorld(world, subGroup);
-                else
-                {
-                    child.Transform = group.Transform * child.Transform;
-                    world.AddShapeToWorld(child);
-                }
+                default:
+                    world.AddShapeToWorld(ProcessShape(item.ToList()));
+                    break;
             }
         }
 
@@ -231,27 +211,18 @@ namespace RayTracerApp
                 "cylinder" => new Cylinder(),
                 "triangle" => new Triangle(null, null, null),
                 "smooth-triangle" => new SmoothTriangle(null, null, null, null, null, null),
-                _ => CheckGroups(shapeName)
+                _ => CheckGroupDefinitions(shapeName)
             };
         }
 
-        private Shape CheckGroups(string nameToCheck)
+        private Shape CheckGroupDefinitions(string shapeName)
         {
-            if (_groupDefinitions.ContainsKey(nameToCheck))
+            if (_groupDefinitions.ContainsKey(shapeName))
             {
-                System.Console.WriteLine($"Found group {nameToCheck}");
-                var foundGroup = _groupDefinitions[nameToCheck];
-                var newGroup = new Group{
-                    Material = foundGroup.Material,
-                    Origin = foundGroup.Origin,
-                    Parent = foundGroup.Parent,
-                    Shapes = foundGroup.Shapes,
-                    Transform = foundGroup.Transform
-                };
-                return newGroup;
+                return _groupDefinitions[shapeName].Clone();
             }
-            else
-                throw new System.Exception($"Unknown Shape type in YAML file: {nameToCheck}");
+
+            throw new System.Exception($"Unknown Shape type in YAML file: {shapeName}");
         }
 
         private Shape ProcessShape(IReadOnlyList<KeyValuePair<string, object>> shapeData)
@@ -265,7 +236,8 @@ namespace RayTracerApp
                     case "material":
                         // Need to de-cipher material attributes
                         var attribValStr = shapeValue.ToString() ?? "";
-                        shapeObject.Material = ProcessMaterial(shapeValue is not Dictionary<object, object> attributeDictionary ? _materialDefinitions[attribValStr] : attributeDictionary);
+                        var attributeDictionary = shapeValue as Dictionary<object, object>;
+                        shapeObject.Material = ProcessMaterial(attributeDictionary ?? _materialDefinitions[attribValStr]);
                         break;
                     case "transform":
                         // Need to de-cipher transform attributes
@@ -312,15 +284,7 @@ namespace RayTracerApp
                         }
                         break;
                     default:
-                        if (_groupDefinitions.ContainsKey(shapeKey))
-                        {
-                            System.Console.WriteLine($"Found group {shapeKey}");
-                        }
-                        else
-                        {
-                            throw new System.Exception($"Unknown attribute in shape data: ({shapeKey}: {shapeValue})");
-                        }
-                        break;
+                        throw new System.Exception($"Unknown attribute in shape data: ({shapeKey}: {shapeValue})");
                 }
             }
             return shapeObject;
@@ -388,10 +352,9 @@ namespace RayTracerApp
 
         private Pattern ProcessPattern(object patternData)
         {
-            var patternInstructions = patternData as Dictionary<object, object>;
-            if (patternInstructions == null)
+            if (patternData is not Dictionary<object, object> patternInstructions)
             {
-                throw new System.Exception("Unknown type(s) in pattern data");
+                throw new System.Exception($"Unknown type(s) in pattern data {patternData}");
             }
 
             Pattern pattern = null;
@@ -437,8 +400,7 @@ namespace RayTracerApp
                 }
                 else if (instruction.Contains("transform"))
                 {
-                    var transform = patternInstructions[instruction] as List<object>;
-                    if (transform == null)
+                    if (patternInstructions[instruction] is not List<object> transform)
                     {
                         throw new System.Exception("Invalid transform format in pattern data");
                     }
@@ -454,11 +416,11 @@ namespace RayTracerApp
                         throw new System.Exception("Invalid colour data format");
                     }
                     
-                    var colourLevels = ExtractTuple(colours[0], "light intensity");
+                    var colourLevels = ExtractTuple(colours[0], "Light intensity");
                     if (pattern == null)
                         continue;
                     pattern.ColourA = new Colour(colourLevels[0], colourLevels[1], colourLevels[2]);
-                    colourLevels = ExtractTuple(colours[1], "light intensity");
+                    colourLevels = ExtractTuple(colours[1], "Light intensity");
                     pattern.ColourB = new Colour(colourLevels[0], colourLevels[1], colourLevels[2]);
                 }
             }
@@ -534,7 +496,7 @@ namespace RayTracerApp
                     }
                     else
                     {
-                        throw new System.Exception("Unknown transform type in transform data");
+                        throw new System.Exception("Unknown transform type in transform data: {instruction}");
                     }
                 }
             }
@@ -550,17 +512,17 @@ namespace RayTracerApp
             {
                 if (lightKey.StartsWith("at"))
                 {
-                    var positionCoords = ExtractTuple(lightValue, "light position");
+                    var positionCoords = ExtractTuple(lightValue, "Light position");
                     lightPosition = new Point(positionCoords[0], positionCoords[1], positionCoords[2]);
                 }
                 else if (lightKey.StartsWith("intensity"))
                 {
-                    var colourLevels = ExtractTuple(lightValue, "light intensity");
+                    var colourLevels = ExtractTuple(lightValue, "Light intensity");
                     lightIntensity = new Colour(colourLevels[0], colourLevels[1], colourLevels[2]);
                 }
                 else
                 {
-                    throw new System.Exception("Unknown light attribute in YAML file");
+                    throw new System.Exception("Unknown light attribute in YAML file: {lightKey}");
                 }
             }
             return new Light(lightPosition, lightIntensity);

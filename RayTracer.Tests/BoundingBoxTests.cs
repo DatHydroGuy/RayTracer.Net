@@ -278,5 +278,19 @@ namespace RayTracer.Tests
             Assert.Equal(expectedMinRight, right.MinPoint);
             Assert.Equal(expectedMaxRight, right.MaxPoint);
         }
+
+        [Fact]
+        public void StringRepresentation()
+        {
+            // Arrange
+            var expected = "[Type:RayTracer.BoundingBox\nMinPoint:[X:∞, Y:∞, Z:∞, W:1]\nMaxPoint:[X:-∞, Y:-∞, Z:-∞, W:1]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\n]";
+            var orig = new BoundingBox();
+
+            // Act
+            var result = orig.ToString();
+
+            // Assert
+            Assert.True(Utilities.ToStringEquals(expected, result));
+        }
     }
 }

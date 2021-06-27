@@ -113,5 +113,25 @@ namespace RayTracer.Tests
             Assert.Equal(orig.Edge1, clone.Edge1);
             Assert.Equal(orig.Edge2, clone.Edge2);
         }
+
+        [Fact]
+        public void StringRepresentation()
+        {
+            // Arrange
+            var expected = "[Type:RayTracer.SmoothTriangle\nId:637604035323461204\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:null\nV1:[X:1, Y:2, Z:3, W:1]\nV2:[X:2, Y:3, Z:4, W:1]\nV3:[X:3, Y:4, Z:5, W:1]\nN1:[X:1, Y:2, Z:3, W:0]\nN2:[X:2, Y:3, Z:4, W:0]\nN3:[X:3, Y:4, Z:5, W:0]\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\n]";
+            var p1 = new Point(1, 2, 3);
+            var p2 = new Point(2, 3, 4);
+            var p3 = new Point(3, 4, 5);
+            var n1 = new Vector(1, 2, 3);
+            var n2 = new Vector(2, 3, 4);
+            var n3 = new Vector(3, 4, 5);
+            var orig = new SmoothTriangle(p1, p2, p3, n1, n2, n3);
+
+            // Act
+            var result = orig.ToString();
+
+            // Assert
+            Assert.True(Utilities.ToStringEquals(expected, result));
+        }
     }
 }

@@ -36,6 +36,12 @@ namespace RayTracer
                 }
         }
 
+        public override string ToString()
+        {
+            var transform = Transform == null ? "null\n" : Transform.ToString();
+            return $"[Type:{GetType()}\nMinPoint:{MinPoint}MaxPoint:{MaxPoint}Transform:{transform}]";
+        }
+
         public BoundingBox(Point minPoint = null, Point maxPoint = null)
         {
             MinPoint = minPoint == null ? new Point(double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity) : minPoint;

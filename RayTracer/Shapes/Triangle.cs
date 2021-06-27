@@ -76,6 +76,13 @@ namespace RayTracer
             };
         }
 
+        public override string ToString()
+        {
+            var baseStr = base.ToString();
+            var materialIndex = baseStr.IndexOf("\nMaterial:");
+            return $"[{baseStr.Substring(0, materialIndex)}\nV1:{Vertex1}V2:{Vertex2}V3:{Vertex3}{baseStr.Substring(materialIndex + 1)}]";
+        }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             var rayCrossEdge2 = ray.Direction.Cross(Edge2);
