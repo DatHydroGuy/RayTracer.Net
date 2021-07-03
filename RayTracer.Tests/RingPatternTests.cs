@@ -1,3 +1,4 @@
+using RayTracer.Patterns;
 using Xunit;
 
 namespace RayTracer.Tests

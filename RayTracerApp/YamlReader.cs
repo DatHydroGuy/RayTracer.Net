@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using RayTracer;
+using RayTracer.Patterns;
 
 namespace RayTracerApp
 {

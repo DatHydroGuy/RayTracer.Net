@@ -1,17 +1,13 @@
-using System;
-
-namespace RayTracer
+namespace RayTracer.Patterns
 {
     public abstract class Pattern
     {
-        private Colour _colourA;
-        private Colour _colourB;
         private Matrix _transform;
         private Matrix _transformInverse;
 
         public Matrix Transform
         {
-            get { return _transform; }
+            get => _transform;
             set { 
                 _transform = value;
                 _transformInverse = value.Inverse();
@@ -19,24 +15,17 @@ namespace RayTracer
         }
         public Matrix TransformInverse
         {
-            get { return _transformInverse; }
+            get => _transformInverse;
             set { 
                 _transformInverse = value;
                 _transform = value.Inverse();
                 }
         }
-        public Colour ColourA
-        {
-            get { return _colourA; }
-            set { _colourA = value; }
-        }
-        public Colour ColourB
-        {
-            get { return _colourB; }
-            set { _colourB = value; }
-        }
-        
-        public Pattern(Colour colourA, Colour colourB)
+        public Colour ColourA { get; set; }
+
+        public Colour ColourB { get; set; }
+
+        protected Pattern(Colour colourA, Colour colourB)
         {
             ColourA = colourA;
             ColourB = colourB;
@@ -55,12 +44,7 @@ namespace RayTracer
         public static bool operator==(Pattern t1, Pattern t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
-            {
-                return object.ReferenceEquals(t2, null);
-            }
-
-            return t1.Equals(t2);
+            return t1?.Equals(t2) ?? ReferenceEquals(t2, null);
         }
 
         public static bool operator!=(Pattern t1, Pattern t2)

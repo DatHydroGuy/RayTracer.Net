@@ -1,4 +1,4 @@
-namespace RayTracer
+namespace RayTracer.Patterns
 {
     public class PerturbedPattern : Pattern
     {

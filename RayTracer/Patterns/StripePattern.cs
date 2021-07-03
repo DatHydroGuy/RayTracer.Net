@@ -1,6 +1,6 @@
 using System;
 
-namespace RayTracer
+namespace RayTracer.Patterns
 {
     public class StripePattern: Pattern
     {        

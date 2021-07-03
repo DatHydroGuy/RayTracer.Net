@@ -1,5 +1,6 @@
 using System;
 using RayTracer;
+using RayTracer.Patterns;
 
 namespace RayTracerApp
 {
@@ -43,13 +44,13 @@ namespace RayTracerApp
             var glass = new Sphere();
             glass.Transform = Transformations.Translation(0, 0, -1) * Transformations.Scaling(0.25, 0.25, 0.25);
             glass.Material = new Material();
-            // glass.Material.Colour = new Colour(1, 1, 1);
-            glass.Material.Colour = new Colour(0.05, 0.05, 0.05);
-            glass.Material.Diffuse = 0.1;
-            glass.Material.Shininess = 300;
-            glass.Material.Reflective = 1;
-            glass.Material.Transparency = 1;
-            glass.Material.RefractiveIndex = 1.52;
+            glass.Material.Colour = new Colour(1, 1, 1);
+            // glass.Material.Colour = new Colour(0.05, 0.05, 0.05);
+            // glass.Material.Diffuse = 0.1;
+            // glass.Material.Shininess = 300;
+            // glass.Material.Reflective = 1;
+            // glass.Material.Transparency = 1;
+            // glass.Material.RefractiveIndex = 1.52;
             return glass;
         }
 
@@ -60,13 +61,13 @@ namespace RayTracerApp
             glass.Maximum = 1;
             glass.Transform = Transformations.Translation(0, 0, -1) * Transformations.RotationY(-Math.PI / 6.0) * Transformations.RotationZ(-Math.PI / 2.0) * Transformations.Scaling(0.25, 1, 0.25);
             glass.Material = new Material();
-            // glass.Material.Colour = new Colour(1, 1, 1);
-            glass.Material.Colour = new Colour(0.05, 0.05, 0.05);
-            glass.Material.Diffuse = 0.1;
-            glass.Material.Shininess = 300;
-            glass.Material.Reflective = 1;
-            glass.Material.Transparency = 1;
-            glass.Material.RefractiveIndex = 1.52;
+            glass.Material.Colour = new Colour(1, 1, 1);
+            // glass.Material.Colour = new Colour(0.05, 0.05, 0.05);
+            // glass.Material.Diffuse = 0.1;
+            // glass.Material.Shininess = 300;
+            // glass.Material.Reflective = 1;
+            // glass.Material.Transparency = 1;
+            // glass.Material.RefractiveIndex = 1.52;
             return glass;
         }
 

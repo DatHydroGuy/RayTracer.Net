@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using RayTracer;
+using RayTracer.Patterns;
 
 namespace RayTracerApp
 {

@@ -4,6 +4,10 @@
 *.suo
 *.user
 *.sln.docstates
+*.7z
+
+# Generated Images
+Images/
 
 # Build results
 [Dd]ebug/
