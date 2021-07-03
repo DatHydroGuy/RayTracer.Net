@@ -1,13 +1,9 @@
 using System;
 
-namespace RayTracer
+namespace RayTracer.Shapes
 {
     public class Plane: Shape
     {
-        public Plane(): base()
-        {
-        }
-
         public override bool Equals(object obj)
         {
             var other = obj as Plane;
@@ -41,12 +37,12 @@ namespace RayTracer
         {
             if (Math.Abs(ray.Direction.Y) < Utilities.EPSILON)
             {
-                return new Intersection[] {};
+                return Array.Empty<Intersection>();
             }
             else
             {
                 var t = -ray.Origin.Y / ray.Direction.Y;    // Calculate slope of ray
-                return new Intersection[] {new Intersection(t, this)};
+                return new Intersection[] {new(t, this)};
             }
         }
 

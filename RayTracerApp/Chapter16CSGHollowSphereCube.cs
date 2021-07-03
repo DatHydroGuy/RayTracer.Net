@@ -1,6 +1,7 @@
 using System;
 using RayTracer;
 using RayTracer.Patterns;
+using RayTracer.Shapes;
 
 namespace RayTracerApp
 {
@@ -71,8 +72,8 @@ namespace RayTracerApp
             bar3.Material.Diffuse = 0.1;
             bar3.Material.Shininess = 300;
 
-            var bars = new CSG(CsgOperation.Union, bar1, bar2);
-            bars = new CSG(CsgOperation.Union, bars, bar3);
+            var bars = new Csg(CsgOperation.Union, bar1, bar2);
+            bars = new Csg(CsgOperation.Union, bars, bar3);
 
             var sphere = new Sphere();
             sphere.Material = new Material();
@@ -88,8 +89,8 @@ namespace RayTracerApp
             cube.Material.Shininess = 300;
             cube.Material.Reflective = 1;
 
-            var result = new CSG(CsgOperation.Intersect, sphere, cube);
-            result = new CSG(CsgOperation.Difference, result, bars);
+            var result = new Csg(CsgOperation.Intersect, sphere, cube);
+            result = new Csg(CsgOperation.Difference, result, bars);
             
             return result;
         }

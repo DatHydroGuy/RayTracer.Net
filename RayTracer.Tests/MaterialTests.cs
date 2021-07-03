@@ -1,5 +1,6 @@
 using System;
 using RayTracer.Patterns;
+using RayTracer.Shapes;
 using Xunit;
 
 namespace RayTracer.Tests

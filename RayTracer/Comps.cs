@@ -1,3 +1,5 @@
+using RayTracer.Shapes;
+
 namespace RayTracer
 {
     public class Comps

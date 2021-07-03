@@ -1,52 +1,41 @@
 using System;
 using System.Threading.Tasks;
 
-namespace RayTracer
+namespace RayTracer.Shapes
 {
     public abstract class Shape
     {
-        protected long _id;
-        private Point _origin;
+        protected readonly long Id;
         private Matrix _transform;
         private Matrix _transformInverse;
-        private Material _material;
-        private Group _parent;
-        
-        public Point Origin
-        {
-            get { return _origin; }
-            set { _origin = value; }
-        }
+
+        public Point Origin { get; set; }
+
         public Matrix Transform
         {
-            get { return _transform; }
+            get => _transform;
             set { 
                 _transform = value;
                 _transformInverse = value.Inverse();
                 }
         }
+
         public Matrix TransformInverse
         {
-            get { return _transformInverse; }
+            get => _transformInverse;
             set { 
                 _transformInverse = value;
                 _transform = value.Inverse();
                 }
         }
-        public Material Material
-        {
-            get { return _material; }
-            set { _material = value; }
-        }
-        public Group Parent
-        {
-            get { return _parent; }
-            set { _parent = value; }
-        }
 
-        public Shape()
+        public Material Material { get; set; }
+
+        public Group Parent { get; set; }
+
+        protected Shape()
         {
-            _id = DateTime.Now.Ticks;
+            Id = DateTime.Now.Ticks;
             Origin = new Point();
             Transform = Matrix.Identity(4);
             Material = new Material();
@@ -68,12 +57,7 @@ namespace RayTracer
         public static bool operator==(Shape t1, Shape t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
-            {
-                return object.ReferenceEquals(t2, null);
-            }
-
-            return t1.Equals(t2);
+            return t1?.Equals(t2) ?? ReferenceEquals(t2, null);
         }
 
         public static bool operator!=(Shape t1, Shape t2)
@@ -83,15 +67,15 @@ namespace RayTracer
 
         public override int GetHashCode()
         {
-            return (int)(Origin.GetHashCode() * 5 + Transform.GetHashCode() * 3 + Material.GetHashCode() * 2);
+            return Origin.GetHashCode() * 5 + Transform.GetHashCode() * 3 + Material.GetHashCode() * 2;
         }
 
         public override string ToString()
         {
-            var parent = Parent == null ? "null" : Parent._id.ToString();
+            var parent = Parent == null ? "null" : Parent.Id.ToString();
             var material = Material == null ? "null\n" : Material.ToString();
             var transform = Transform == null ? "null\n" : Transform.ToString();
-            return $"Type:{GetType()}\nId:{_id}\nOrigin:{Origin}Parent:{parent}\nMaterial:{material}Transform:{transform}";
+            return $"Type:{GetType()}\nId:{Id}\nOrigin:{Origin}Parent:{parent}\nMaterial:{material}Transform:{transform}";
         }
 
         public Intersection[] Intersects(Ray ray)
@@ -146,39 +130,38 @@ namespace RayTracer
         public bool Contains(Shape child)
         {
             var asGroup = this as Group;
-            var asCSG = this as CSG;
+            var asCsg = this as Csg;
 
-            if(asCSG != null)
+            if(asCsg != null)
             {
-                return (asCSG.Left.Contains(child) || asCSG.Right.Contains(child));
+                return (asCsg.Left.Contains(child) || asCsg.Right.Contains(child));
             }
-            else if (asGroup != null)
+
+            if (asGroup != null)
             {
                 return asGroup.Contains(child);
             }
-            else
-            {
-                return this == child;
-            }
+
+            return this == child;
         }
 
         public static void Divide(Shape shape, int threshold)
         {
             var asGroup = shape as Group;
-            var asCSG = shape as CSG;
+            var asCsg = shape as Csg;
 
-            if(asCSG != null)
+            if(asCsg != null)
             {
                 var leftGroup = new Group();
-                leftGroup.AddChildren(new Shape[] {asCSG.Left});
-                asCSG.Left = leftGroup;
+                leftGroup.AddChildren(new[] {asCsg.Left});
+                asCsg.Left = leftGroup;
 
                 var rightGroup = new Group();
-                rightGroup.AddChildren(new Shape[] {asCSG.Right});
-                asCSG.Right = rightGroup;
+                rightGroup.AddChildren(new[] {asCsg.Right});
+                asCsg.Right = rightGroup;
 
-                Shape.Divide(asCSG.Left, threshold);
-                Shape.Divide(asCSG.Right, threshold);
+                Divide(asCsg.Left, threshold);
+                Divide(asCsg.Right, threshold);
             }
             else if (asGroup != null)
             {
@@ -197,7 +180,7 @@ namespace RayTracer
 
                 Parallel.ForEach(asGroup.Shapes, childGroup =>
                 {
-                    Shape.Divide(childGroup, threshold);
+                    Divide(childGroup, threshold);
                 });
             }
         }

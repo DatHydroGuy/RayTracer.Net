@@ -1,29 +1,19 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace RayTracer
+namespace RayTracer.Shapes
 {
     public class Group: Shape
     {
-        private List<Shape> _shapes;
-        private BoundingBox _aabb;
-        
-        public List<Shape> Shapes
-        {
-            get { return _shapes; }
-            set { _shapes = value; }
-        }
-        public BoundingBox AABB
-        {
-            get { return _aabb; }
-            set { _aabb = value; }
-        }
-        
-        public Group(): base()
+        public List<Shape> Shapes { get; set; }
+
+        public BoundingBox Aabb { get; set; }
+
+        public Group()
         {
             Shapes = new List<Shape>();
-            AABB = null;
+            Aabb = null;
         }
 
         public override bool Equals(object obj)
@@ -53,12 +43,12 @@ namespace RayTracer
 
         public override string ToString()
         {
-            var parent = Parent == null ? "null" : Parent._id.ToString();
+            var parent = Parent == null ? "null" : Parent.Id.ToString();
             var currGroup = $"Type:{GetType()}, Origin:{Origin}Parent:{parent}\nMaterial:{Material}Transform:{Transform}Children:\n";
             var children = "";
             foreach (var shape in Shapes)
             {
-                children += shape.ToString() + "\n";
+                children += shape + "\n";
             }
 
             return currGroup + children;
@@ -66,10 +56,9 @@ namespace RayTracer
 
         public override Intersection[] LocalIntersects(Ray ray)
         {
-            if (AABB == null)
-                AABB = GetBoundingBox();
+            Aabb ??= GetBoundingBox();
 
-            if (AABB.Intersects(ray))
+            if (Aabb.Intersects(ray))
             {
                 var result = new List<Intersection>();
 
@@ -78,12 +67,12 @@ namespace RayTracer
                     result.AddRange(shape.Intersects(ray));
                 }
 
-                result.Sort(new System.Comparison<Intersection>((x, y) => x.T.CompareTo(y.T)));
+                result.Sort((x, y) => x.T.CompareTo(y.T));
                 return result.ToArray();
             }
             else
             {
-                return new Intersection[] {};
+                return System.Array.Empty<Intersection>();
             }
         }
 
@@ -108,23 +97,18 @@ namespace RayTracer
         public void AddChildren(IEnumerable<Shape> s)
         {
             Shapes.AddRange(s);
-            // foreach (var child in s)
-            // {
-            //     child.Parent = this;
-            //     Shapes.Add(child);
-            // }
             Parallel.ForEach(Shapes, child =>
             {
                 child.Parent = this;
             });
-            AABB = null;
+            Aabb = null;
         }
 
         public void AddChild(Shape s)
         {
             s.Parent = this;
             Shapes.Add(s);
-            AABB = null;
+            Aabb = null;
         }
 
         public void SetMaterial(Material newMaterial)
@@ -146,17 +130,15 @@ namespace RayTracer
         public void PartitionChildObjects(out Group left, out Group right)
         {
             var aabb = GetBoundingBox();
-            BoundingBox leftBB;
-            BoundingBox rightBB;
-            aabb.SplitBounds(out leftBB, out rightBB);
+            aabb.SplitBounds(out var leftBb, out var rightBb);
 
             left = new Group();
-            var leftShapes = Shapes.AsParallel().Where(x => leftBB.ContainsBox(x.GetParentSpaceBoundingBox())).ToList();
+            var leftShapes = Shapes.AsParallel().Where(x => leftBb.ContainsBox(x.GetParentSpaceBoundingBox())).ToList();
             Shapes.RemoveAll(x => leftShapes.Contains(x));
             left.AddChildren(leftShapes);
 
             right = new Group();
-            var rightShapes = Shapes.AsParallel().Where(x => rightBB.ContainsBox(x.GetParentSpaceBoundingBox())).ToList();
+            var rightShapes = Shapes.AsParallel().Where(x => rightBb.ContainsBox(x.GetParentSpaceBoundingBox())).ToList();
             Shapes.RemoveAll(x => rightShapes.Contains(x));
             right.AddChildren(rightShapes);
         }
@@ -164,8 +146,9 @@ namespace RayTracer
         public void CreateSubgroup(IEnumerable<Shape> shapes)
         {
             var subGroup = new Group();
-            subGroup.AddChildren(shapes);
-            Shapes.RemoveAll(x => shapes.Contains(x));
+            IEnumerable<Shape> shapesArray = shapes as Shape[] ?? shapes.ToArray();
+            subGroup.AddChildren(shapesArray);
+            Shapes.RemoveAll(x => shapesArray.Contains(x));
             Shapes.Add(subGroup);
         }
     }

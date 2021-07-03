@@ -1,27 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace RayTracer
+namespace RayTracer.Shapes
 {
     /// Source: http://blog.marcinchwedczuk.pl/ray-tracing-torus
-    public class Torus: Shape
+    public class Torus : Shape
     {
-        private double _majorRadius;
-        private double _minorRadius;
+        public double MajorRadius { get; set; }
 
-        public double MajorRadius
-        {
-            get { return _majorRadius; }
-            set { _majorRadius = value; }
-        }
-        public double MinorRadius
-        {
-            get { return _minorRadius; }
-            set { _minorRadius = value; }
-        }
+        public double MinorRadius { get; set; }
 
         /* For best results, keep both MajorRadius and MinorRadius <1 and use scaling transformation */
-        public Torus(double majorRadius = 0, double minorRadius = 0): base()
+        public Torus(double majorRadius = 0, double minorRadius = 0)
         {
             MajorRadius = majorRadius == 0 ? 0.75 : majorRadius;
             MinorRadius = minorRadius == 0 ? 0.25 : minorRadius;
@@ -29,11 +20,8 @@ namespace RayTracer
 
         public override bool Equals(object obj)
         {
-            var other = obj as Torus;
-
-            return base.Equals(other) &&
-                MajorRadius == other.MajorRadius &&
-                MinorRadius == other.MinorRadius;
+            return obj is Torus other && base.Equals(other) && Utilities.AlmostEqual(MajorRadius, other.MajorRadius) &&
+                   Utilities.AlmostEqual(MinorRadius, other.MinorRadius);
         }
 
         public override int GetHashCode()
@@ -55,8 +43,9 @@ namespace RayTracer
         public override string ToString()
         {
             var baseStr = base.ToString();
-            var materialIndex = baseStr.IndexOf("\nMaterial:");
-            return $"[{baseStr.Substring(0, materialIndex)}\nMinorRadius:{MinorRadius},MajorRadius:{MajorRadius}\n{baseStr.Substring(materialIndex + 1)}]";
+            var materialIndex = baseStr.IndexOf("\nMaterial:", StringComparison.Ordinal);
+            return
+                $"[{baseStr[..materialIndex]}\nMinorRadius:{MinorRadius},MajorRadius:{MajorRadius}\n{baseStr[(materialIndex + 1)..]}]";
         }
 
         public override Intersection[] LocalIntersects(Ray ray)
@@ -101,7 +90,7 @@ namespace RayTracer
             var dY = ray.Direction.Y;
             var dZ = ray.Direction.Z;
 
-            var sumDSquared = dX * dX + dY * dY + dZ * dZ;      // By definition of a normalised ray vector, this is always 1
+            var sumDSquared = dX * dX + dY * dY + dZ * dZ; // By definition of a normalised ray vector, this is always 1
             var sumOSquared = oX * oX + oY * oY + oZ * oZ;
             var e = sumOSquared - MajorRadius * MajorRadius - MinorRadius * MinorRadius;
             var f = oX * dX + oY * dY + oZ * dZ;
@@ -128,12 +117,9 @@ namespace RayTracer
 
             // var results = Utilities.Solve4(quarticA, quarticB, quarticC, quarticD, quarticE);
 
-            var intersections = new List<Intersection>();
-            foreach (var root in results)
-            {
-                intersections.Add(new Intersection(root, this));
-            }
-            intersections.Sort(new Comparison<Intersection>((x, y) => x.T.CompareTo(y.T)));
+            var intersections = results.Select(root => new Intersection(root, this)).ToList();
+
+            intersections.Sort((x, y) => x.T.CompareTo(y.T));
             return intersections.ToArray();
         }
 

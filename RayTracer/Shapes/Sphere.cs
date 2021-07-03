@@ -1,28 +1,19 @@
 using System;
 
-namespace RayTracer
+namespace RayTracer.Shapes
 {
     public class Sphere: Shape
     {
-        private double _radius;
+        public double Radius { get; set; }
 
-        public double Radius
-        {
-            get { return _radius; }
-            set { _radius = value; }
-        }
-
-        public Sphere(): base()
+        public Sphere()
         {
             Radius = 1.0;
         }
 
         public override bool Equals(object obj)
         {
-            var other = obj as Sphere;
-
-            return base.Equals(other) &&
-                Radius == other.Radius;
+            return obj is Sphere other && base.Equals(other) && Utilities.AlmostEqual(Radius, other.Radius);
         }
 
         public override int GetHashCode()
@@ -45,8 +36,8 @@ namespace RayTracer
         public override string ToString()
         {
             var baseStr = base.ToString();
-            var materialIndex = baseStr.IndexOf("\nMaterial:");
-            return $"[{baseStr.Substring(0, materialIndex)}\nRadius:{Radius}\n{baseStr.Substring(materialIndex + 1)}]";
+            var materialIndex = baseStr.IndexOf("\nMaterial:", StringComparison.Ordinal);
+            return $"[{baseStr[..materialIndex]}\nRadius:{Radius}\n{baseStr[(materialIndex + 1)..]}]";
         }
 
         public override Intersection[] LocalIntersects(Ray ray)
@@ -61,7 +52,7 @@ namespace RayTracer
 
             // If discriminant < 0, then the ray misses the sphere altogether
             if ( discriminant < 0 )
-                return new Intersection[] {};
+                return Array.Empty<Intersection>();
             
             var t1 = (-b - Math.Sqrt(discriminant)) / (2 * a);
             var t2 = (-b + Math.Sqrt(discriminant)) / (2 * a);
@@ -80,9 +71,14 @@ namespace RayTracer
 
         public static Sphere GlassSphere()
         {
-            var s = new Sphere();
-            s.Material.Transparency = 1.0;
-            s.Material.RefractiveIndex = 1.5;
+            var s = new Sphere
+            {
+                Material =
+                {
+                    Transparency = 1.0,
+                    RefractiveIndex = 1.5
+                }
+            };
             return s;
         }
     }

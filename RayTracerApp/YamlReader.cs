@@ -4,6 +4,7 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using RayTracer;
 using RayTracer.Patterns;
+using RayTracer.Shapes;
 
 namespace RayTracerApp
 {
@@ -168,7 +169,7 @@ namespace RayTracerApp
                                             }
                                         }
 
-                                        var csg = new CSG(operation, csgChildren[0], csgChildren[1]);
+                                        var csg = new Csg(operation, csgChildren[0], csgChildren[1]);
                                         _groupDefinitions.Add(name, csg);
                                         break;
                                     }

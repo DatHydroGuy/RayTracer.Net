@@ -1,5 +1,6 @@
 using System;
 using RayTracer.Patterns;
+using RayTracer.Shapes;
 
 namespace RayTracer
 {

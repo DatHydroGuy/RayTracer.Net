@@ -1,3 +1,4 @@
+using RayTracer.Shapes;
 using Xunit;
 
 namespace RayTracer.Tests
@@ -411,7 +412,7 @@ namespace RayTracer.Tests
         public void StringRepresentation()
         {
             // Arrange
-            var expected = "Type:RayTracer.Group, Origin:[X:0, Y:0, Z:0, W:1]\nParent:null\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nChildren:\n[Type:RayTracer.Tests.TestShape\nId:637603307156449547\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603307156427896\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n[Type:RayTracer.Tests.TestShape\nId:637603307156449806\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603307156427896\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n";
+            var expected = "Type:RayTracer.Shapes.Group, Origin:[X:0, Y:0, Z:0, W:1]\nParent:null\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nChildren:\n[Type:RayTracer.Tests.TestShape\nId:637603307156449547\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603307156427896\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n[Type:RayTracer.Tests.TestShape\nId:637603307156449806\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603307156427896\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n";
             var orig = new Group();
             var s1 = new TestShape();
             var s2 = new TestShape();

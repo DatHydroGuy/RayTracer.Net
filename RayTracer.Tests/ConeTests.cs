@@ -1,3 +1,4 @@
+using RayTracer.Shapes;
 using Xunit;
 
 namespace RayTracer.Tests
@@ -244,7 +245,7 @@ namespace RayTracer.Tests
         public void StringRepresentation()
         {
             // Arrange
-            var expected = "[Type:RayTracer.Cone\nId:637602294772396341\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:null\nRadius:1,Min:-∞,Max:∞,Closed:False\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\n]";
+            var expected = "[Type:RayTracer.Shapes.Cone\nId:637602294772396341\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:null\nRadius:1,Min:-∞,Max:∞,Closed:False\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\n]";
             var orig = new Cone();
 
             // Act

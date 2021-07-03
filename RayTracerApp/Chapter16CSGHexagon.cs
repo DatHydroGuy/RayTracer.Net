@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using RayTracer;
 using RayTracer.Patterns;
+using RayTracer.Shapes;
 
 namespace RayTracerApp
 {
@@ -69,17 +70,17 @@ namespace RayTracerApp
                 bars.Add(bar);
 
             }
-            var hex = new CSG(CsgOperation.Union, balls[0], balls[1]);
-            hex = new CSG(CsgOperation.Union, hex, balls[2]);
-            hex = new CSG(CsgOperation.Union, hex, balls[3]);
-            hex = new CSG(CsgOperation.Union, hex, balls[4]);
-            hex = new CSG(CsgOperation.Union, hex, balls[5]);
-            hex = new CSG(CsgOperation.Union, hex, bars[0]);
-            hex = new CSG(CsgOperation.Union, hex, bars[1]);
-            hex = new CSG(CsgOperation.Union, hex, bars[2]);
-            hex = new CSG(CsgOperation.Union, hex, bars[3]);
-            hex = new CSG(CsgOperation.Union, hex, bars[4]);
-            hex = new CSG(CsgOperation.Union, hex, bars[5]);
+            var hex = new Csg(CsgOperation.Union, balls[0], balls[1]);
+            hex = new Csg(CsgOperation.Union, hex, balls[2]);
+            hex = new Csg(CsgOperation.Union, hex, balls[3]);
+            hex = new Csg(CsgOperation.Union, hex, balls[4]);
+            hex = new Csg(CsgOperation.Union, hex, balls[5]);
+            hex = new Csg(CsgOperation.Union, hex, bars[0]);
+            hex = new Csg(CsgOperation.Union, hex, bars[1]);
+            hex = new Csg(CsgOperation.Union, hex, bars[2]);
+            hex = new Csg(CsgOperation.Union, hex, bars[3]);
+            hex = new Csg(CsgOperation.Union, hex, bars[4]);
+            hex = new Csg(CsgOperation.Union, hex, bars[5]);
             return hex;
         }
     }
