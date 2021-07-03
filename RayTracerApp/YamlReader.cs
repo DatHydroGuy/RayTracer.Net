@@ -13,13 +13,14 @@ namespace RayTracerApp
         private readonly Dictionary<string, Group> _groupDefinitions = new();
         private readonly Dictionary<string, int> _renderingDetails = new() {{"reflectiondepth", 5}, {"antialiaslevel", 1}, {"showprogress", 0}};
         private static string _imagesFolder = "";
+        private static string _objFolder = "";
 
         public YamlReader(string yamlFile)
         {
             if (!System.IO.File.Exists(yamlFile))
                 System.Console.WriteLine($"YAML file {yamlFile} not found.");
             
-            CreateImagesFolder();
+            CreateHelperFolders();
 
             var rawLines = System.IO.File.ReadAllText(yamlFile);
             var deserializer = new DeserializerBuilder()
@@ -29,16 +30,21 @@ namespace RayTracerApp
             ConvertToObjects(rawObjects);
         }
 
-        private static void CreateImagesFolder()
+        private static void CreateHelperFolders()
         {
             var currDir = System.IO.Directory.GetCurrentDirectory();
             var parentDir = System.IO.Path.GetFullPath(System.IO.Path.Combine(currDir, ".."));
             var imageDir = System.IO.Path.GetFullPath(System.IO.Path.Combine(parentDir, "Images"));
-            if (!System.IO.Directory.Exists(imageDir))
+            var objDir = System.IO.Path.GetFullPath(System.IO.Path.Combine(parentDir, "Obj"));
+            foreach (var folder in new[]{imageDir, objDir})
             {
-                System.IO.Directory.CreateDirectory(imageDir);
+                if (!System.IO.Directory.Exists(folder))
+                {
+                    System.IO.Directory.CreateDirectory(folder);
+                }
             }
             _imagesFolder = imageDir;
+            _objFolder = objDir;
         }
 
         private void ConvertToObjects(IReadOnlyCollection<Dictionary<string, object>> objects)
@@ -64,7 +70,7 @@ namespace RayTracerApp
                     case "file":
                     {
                         outFile = item.Values.First().ToString();
-                        outFile = outFile.Split(System.IO.Path.DirectorySeparatorChar).Last();
+                        outFile = outFile?.Split(System.IO.Path.DirectorySeparatorChar).Last();
                         outFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(_imagesFolder, outFile ?? "default.ppm"));
                         System.Console.WriteLine($"Writing to file: {outFile}");
                         break;
@@ -103,32 +109,105 @@ namespace RayTracerApp
                         {
                             case Dictionary<object, object> tempObject:
                                 var (firstKey, firstValue) = tempObject.First();
-                                if (firstKey.ToString() == "add" && firstValue.ToString() == "group")
+                                switch (firstKey.ToString())
                                 {
-                                    // Need to unpack tempObject and then pass it into ProcessShape()
-                                    var g = new Group();
-                                    var childData = (List<object>) tempObject.Values.Last();
-                                    foreach (var childDictionary in childData)
+                                    case "add" when firstValue.ToString() == "group":
                                     {
-                                        var arguments = new List<KeyValuePair<string, object>>();
+                                        // Need to unpack tempObject and then pass it into ProcessShape()
+                                        var g = new Group();
+                                        var childData = (List<object>) tempObject.Values.Last();
+                                        foreach (var childDictionary in childData)
+                                        {
+                                            var arguments = new List<KeyValuePair<string, object>>();
 
-                                        foreach (var (tempKey, tempValue) in (Dictionary<object, object>) childDictionary)
+                                            foreach (var (tempKey, tempValue) in (Dictionary<object, object>) childDictionary)
+                                            {
+                                                arguments.Add(new KeyValuePair<string, object>(tempKey.ToString(), tempValue));
+                                            }
+
+                                            var s = ProcessShape(arguments);
+                                            g.AddChild(s);
+                                        }
+                                        _groupDefinitions.Add(name, g);
+                                        break;
+                                    }
+                                    case "add" when firstValue.ToString() == "csg":
+                                    {
+                                        // Need to unpack tempObject and then pass it into ProcessShape()
+                                        var childData = tempObject.Skip(1).ToList();
+                                        var opText = childData.Find(x => x.Key.ToString() == "operation").Value.ToString();
+                                        var operation = opText switch
+                                        {
+                                            "difference" => CsgOperation.Difference,
+                                            "intersect" => CsgOperation.Intersect,
+                                            "union" => CsgOperation.Union,
+                                            _ => CsgOperation.None
+                                        };
+                                        var children = childData.FindAll(x => x.Key.ToString() != "operation").ToList();
+                                        // var left = (List<object>)childData.Find(x => x.Key.ToString() == "left").Value;
+                                        // var right = (List<object>)childData.Find(x => x.Key.ToString() == "right").Value;
+                                        var csgChildren = new List<Shape>(2) {null, null};
+                                        foreach (var (childKey, childValue) in children)
+                                        {
+                                            var arguments = new List<KeyValuePair<string, object>>();
+                                            var childList = ((List<object>) childValue).First();
+                                            foreach (var (tempKey, tempValue) in (Dictionary<object, object>) childList)
+                                            {
+                                                arguments.Add(new KeyValuePair<string, object>(tempKey.ToString(), tempValue));
+                                            }
+
+                                            var s = ProcessShape(arguments);
+                                            if (childKey.ToString() == "left")
+                                            {
+                                                csgChildren[0] = s;
+                                            }
+                                            else
+                                            {
+                                                csgChildren[1] = s;
+                                            }
+                                        }
+
+                                        var csg = new CSG(operation, csgChildren[0], csgChildren[1]);
+                                        _groupDefinitions.Add(name, csg);
+                                        break;
+                                    }
+                                    case "add" when firstValue.ToString() == "obj":
+                                    {
+                                        // Need to locate obj file
+                                        var (_, fileValue) = tempObject.Skip(1).First();
+                                        var objFile = fileValue.ToString();
+                                        fileValue = objFile?.Split(System.IO.Path.DirectorySeparatorChar).Last();
+                                        objFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(_objFolder, fileValue.ToString() ?? "default.ppm"));
+                                        System.Console.WriteLine($"Loading .obj file: {objFile}");
+                                        var parser = new ObjParser();
+                                        parser.ReadFile(objFile.ToString());
+                                        var obj = parser.ObjToGroup();
+                                        // Create a dummy shape(sphere) to hold the transform & material for the object
+                                        var arguments = new List<KeyValuePair<string, object>> {new("add", "sphere")};
+                                        foreach (var (tempKey, tempValue) in tempObject.Skip(2))
                                         {
                                             arguments.Add(new KeyValuePair<string, object>(tempKey.ToString(), tempValue));
                                         }
-
+                                        // Assign object transform & material to dummy shape
                                         var s = ProcessShape(arguments);
-                                        g.AddChild(s);
+                                        // Copy (non-default) transform & material from dummy shape to object
+                                        obj.Transform = s.Transform;
+                                        if (s.Material != new Material())
+                                        {
+                                            obj.SetMaterial(s.Material);
+                                        }
+                                        _groupDefinitions.Add(name, obj);
+                                        break;
                                     }
-                                    _groupDefinitions.Add(name, g);
-                                }
-                                else
-                                {
-                                    foreach (var (materialDefKey, materialDefValue) in tempObject.Where(kvp => !materialValuesList.TryAdd(kvp.Key, kvp.Value)))
+                                    default:
                                     {
-                                        materialValuesList[materialDefKey] = materialDefValue;    // overwrite any pre-existing values
+                                        foreach (var (materialDefKey, materialDefValue) in tempObject.Where(kvp => !materialValuesList.TryAdd(kvp.Key, kvp.Value)))
+                                        {
+                                            materialValuesList[materialDefKey] = materialDefValue;    // overwrite any pre-existing values
+                                        }
+                                        _materialDefinitions.Add(name, materialValuesList);
+                                        break;
                                     }
-                                    _materialDefinitions.Add(name, materialValuesList);
                                 }
                                 break;
                             case List<object> tempTransform:
@@ -144,19 +223,20 @@ namespace RayTracerApp
             }
         }
 
-        private void DefineTransform(string name, List<object> tempTransform, ref List<object> transformValuesList)
+        private void DefineTransform(string name, IEnumerable<object> tempTransform, ref List<object> transformValuesList)
         {
             foreach (var item in tempTransform)
             {
-                var itemStr = item.ToString() ?? "";
-                if (_transformDefinitions.ContainsKey(itemStr))
-                {
-                    transformValuesList.AddRange(_transformDefinitions[itemStr]);
-                }
-                else
-                {
-                    transformValuesList.Add(item);
-                }
+                transformValuesList.Add(item);
+                // var itemStr = item.ToString() ?? "";
+                // if (_transformDefinitions.ContainsKey(itemStr))
+                // {
+                //     transformValuesList.AddRange(_transformDefinitions[itemStr]);
+                // }
+                // else
+                // {
+                //     transformValuesList.Add(item);
+                // }
             }                        
             _transformDefinitions.Add(name, transformValuesList);
         }
@@ -209,8 +289,8 @@ namespace RayTracerApp
                 "cube" => new Cube(),
                 "cone" => new Cone(),
                 "cylinder" => new Cylinder(),
-                "triangle" => new Triangle(null, null, null),
-                "smooth-triangle" => new SmoothTriangle(null, null, null, null, null, null),
+                "triangle" => new Triangle(new Point(), new Point(), new Point()),
+                "smooth-triangle" => new SmoothTriangle(new Point(), new Point(), new Point(), new Vector(), new Vector(), new Vector()),
                 _ => CheckGroupDefinitions(shapeName)
             };
         }
@@ -234,16 +314,30 @@ namespace RayTracerApp
                 switch (shapeKey)
                 {
                     case "material":
+                    {
                         // Need to de-cipher material attributes
                         var attribValStr = shapeValue.ToString() ?? "";
                         var attributeDictionary = shapeValue as Dictionary<object, object>;
-                        shapeObject.Material = ProcessMaterial(attributeDictionary ?? _materialDefinitions[attribValStr]);
+                        var tempMaterial = ProcessMaterial(attributeDictionary ?? _materialDefinitions[attribValStr]);
+                        if (shapeObject is Group grp)
+                        {
+                            grp.SetMaterial(tempMaterial);
+                        }
+                        else
+                        {
+                            shapeObject.Material = tempMaterial;
+                        }
+
                         break;
+                    }
                     case "transform":
+                    {
                         // Need to de-cipher transform attributes
+                        var attribValStr = shapeValue.ToString() ?? "";
                         var attributeList = shapeValue as List<object>;
-                        shapeObject.Transform = ProcessTransform(attributeList);
+                        shapeObject.Transform = ProcessTransform(attributeList ?? _transformDefinitions[attribValStr]);
                         break;
+                    }
                     case "minimum":
                         switch (shapeObject)
                         {
@@ -283,6 +377,51 @@ namespace RayTracerApp
                                 throw new System.Exception($"Unknown shape type with closed attribute: {shapeObject.GetType().Name}");
                         }
                         break;
+                    case "vertices":
+                    {
+                        switch (shapeObject)
+                        {
+                            case Triangle triangle:
+                            {
+                                var vertices = (List<object>) shapeValue;
+                                var p1 = ExtractTuple(vertices[0], "Triangle vertices");
+                                var p2 = ExtractTuple(vertices[1], "Triangle vertices");
+                                var p3 = ExtractTuple(vertices[2], "Triangle vertices");
+                                triangle.Update(new Point(p1[0], p1[1], p1[2]),
+                                    new Point(p2[0], p2[1], p2[2]),
+                                    new Point(p3[0], p3[1], p3[2]));
+                                break;
+                            }
+                            case SmoothTriangle smoothTriangle:
+                            {
+                                var vertices = (List<object>) shapeValue;
+                                var p1 = ExtractTuple(vertices[0], "Triangle vertices");
+                                var p2 = ExtractTuple(vertices[1], "Triangle vertices");
+                                var p3 = ExtractTuple(vertices[2], "Triangle vertices");
+                                smoothTriangle.UpdatePoints(new Point(p1[0], p1[1], p1[2]),
+                                    new Point(p2[0], p2[1], p2[2]),
+                                    new Point(p3[0], p3[1], p3[2]));
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                    case "normals":
+                    {
+                        if (shapeObject is SmoothTriangle smoothTriangle)
+                        {
+                            var normals = (List<object>) shapeValue;
+                            var n1 = ExtractTuple(normals[0], "Triangle vertices");
+                            var n2 = ExtractTuple(normals[1], "Triangle vertices");
+                            var n3 = ExtractTuple(normals[2], "Triangle vertices");
+                            smoothTriangle.UpdateNormals(new Vector(n1[0], n1[1], n1[2]),
+                                new Vector(n2[0], n2[1], n2[2]),
+                                new Vector(n3[0], n3[1], n3[2]));
+                        }
+
+                        break;
+                    }
                     default:
                         throw new System.Exception($"Unknown attribute in shape data: ({shapeKey}: {shapeValue})");
                 }

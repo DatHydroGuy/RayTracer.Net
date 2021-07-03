@@ -1,0 +1,149 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter16_csg_hollowspherecube_YAML2.ppm
+
+# ======================================================
+# definitions
+# ======================================================
+
+- define: cylinder-scaling
+  value:
+    - [ scale, 0.5, 1, 0.5 ]
+
+- define: 2tubes
+  value:
+    add: csg
+    operation: union
+    left:
+      - add: cylinder
+        minimum: -1
+        maximum: 1
+        closed: true
+        transform:
+          - cylinder-scaling
+        material:
+          color: [ 1, 0, 0 ]
+          diffuse: 0.1
+          shininess: 300
+    right:
+      - add: cylinder
+        minimum: -1
+        maximum: 1
+        closed: true
+        transform:
+          - cylinder-scaling
+          - [rotate-z, 1.5708]
+        material:
+          color: [ 0, 1, 0 ]
+          diffuse: 0.1
+          shininess: 300
+
+- define: 3tubes
+  value:
+    add: csg
+    operation: union
+    left:
+      - add: 2tubes
+    right:
+      - add: cylinder
+        minimum: -1
+        maximum: 1
+        closed: true
+        transform:
+          - cylinder-scaling
+          - [rotate-x, 1.5708]
+        material:
+          color: [ 0, 0, 1 ]
+          diffuse: 0.1
+          shininess: 300
+
+- define: cube-sphere
+  value:
+    add: csg
+    operation: intersect
+    left:
+      - add: sphere
+        material:
+          color: [ 0.3, 0.3, 0.3 ]
+          diffuse: 0.1
+          shininess: 300
+    right:
+      - add: cube
+        transform:
+          - [scale, 0.75, 0.75, 0.75]
+        material:
+          color: [ 1, 1, 1 ]
+          color: [ 0.05, 0.05, 0.05 ]
+          diffuse: 0.1
+          shininess: 300
+          reflective: 1
+
+- define: final-shape
+  value:
+    add: csg
+    operation: difference
+    left:
+      - add: cube-sphere
+    right:
+      - add: 3tubes
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 600
+  field-of-view: 1.047
+  from: [-0.5, 2.5, -5]
+  to: [0, 1, 0]
+  up: [0, 1, 0]
+  show-progress: true
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-5, 3, -10]
+  intensity: [1, 1, 1]
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  material:
+    pattern:
+      type: checker
+      colors:
+        - [1, 0.3, 0.7]
+        - [0.3, 1, 0.7]
+      transform:
+        - [ translate, 0.01, 0.01, 0.01 ]
+    specular: 0
+
+# the sky
+- add: plane
+  transform:
+    - [translate, 0, 5, 0]
+  material:
+    pattern:
+      type: double-gradient
+      colors:
+        - [0.8, 0.8, 1]
+        - [0.1, 0.1, 1]
+      transform:
+        - [ scale, 100000, 100000, 100000 ]
+    ambient: 0.9
+    specular: 0
+
+# group object
+- add: final-shape
+  transform:
+    - [rotate-y, -0.3]
+    - [ scale, 1.33, 1.33, 1.33 ]
+    - [ translate, 0, 1, 0 ]

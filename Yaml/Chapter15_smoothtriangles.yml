@@ -1,0 +1,85 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter15_smoothtriangle_YAML2.ppm
+
+# ======================================================
+# define some constants to avoid duplication
+# ======================================================
+
+- define: base-material
+  value:
+    pattern:
+      type: checker
+      colors:
+        - [0.5, 0.5, 0.5]
+        - [0.8, 0.8, 0.8]
+      transform:
+        - [ scale, 0.5, 0.5, 0.5 ]
+    specular: 0
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 600
+  field-of-view: 1.047
+  from: [0, 1.5, -6]
+  to: [0, 1, 0]
+  up: [0, 1, 0]
+  show-progress: true
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-5, 3, -10]
+  intensity: [1, 1, 1]
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  transform:
+    - [rotatey, -0.7853]
+  material: base-material
+
+# left wall
+- add: plane
+  transform:
+    - [translate, 0, 0, 5]
+    - [rotatex, 1.5706]
+    - [rotatey, -0.7853]
+  material: base-material
+
+# right wall
+- add: plane
+  transform:
+    - [translate, 0, 0, 5]
+    - [rotatex, 1.5706]
+    - [rotatey, 0.7853]
+  material: base-material
+
+# triangle object
+- add: smooth-triangle
+  vertices:
+    - [ -1, 0, -1.5 ]
+    - [ 0.5, 2, -1.6 ]
+    - [ 2, 0, -1.7 ]
+  normals:
+    - [ -1, 0, -3 ]
+    - [ 0, 0, 0 ]
+    - [ 1, 0, -3 ]
+  material:
+    colour: [ 0.05, 0.05, 0.55 ]
+    diffuse: 0.1
+    shininess: 300
+    reflective: 0.5
+    transparency: 0.5
+    refractive-index: 1.52

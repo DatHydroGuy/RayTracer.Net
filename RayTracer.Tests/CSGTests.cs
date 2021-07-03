@@ -196,8 +196,8 @@ namespace RayTracer.Tests
             var xs = csg.Intersects(ray);
 
             // Assert
-            Assert.NotNull(left.SavedRay);
-            Assert.NotNull(right.SavedRay);
+            Assert.NotNull(((TestShape)(csg.Left)).SavedRay);
+            Assert.NotNull(((TestShape)(csg.Right)).SavedRay);
         }
 
         [Fact]
@@ -219,6 +219,8 @@ namespace RayTracer.Tests
             right.AddChildren(new Shape[] {s3, s4});
 
             var shape = new CSG(CsgOperation.Difference, left, right);
+            left = ((Group)(shape.Left));
+            right = ((Group)(shape.Right));
 
             // Act
             Shape.Divide(shape, 1);

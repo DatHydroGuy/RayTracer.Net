@@ -42,6 +42,11 @@ namespace RayTracer
         
         public Triangle(Point p1, Point p2, Point p3): base()
         {
+            Update(p1, p2, p3);
+        }
+        
+        public void Update(Point p1, Point p2, Point p3)
+        {
             Vertex1 = p1;
             Vertex2 = p2;
             Vertex3 = p3;

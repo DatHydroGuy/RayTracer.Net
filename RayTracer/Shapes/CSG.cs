@@ -35,11 +35,11 @@ namespace RayTracer
         
         public CSG(CsgOperation operation, Shape shape1, Shape shape2): base()
         {
-            Operation = operation == CsgOperation.Union || operation == CsgOperation.Intersect || operation == CsgOperation.Difference ? operation : CsgOperation.None;
+            Operation = operation is CsgOperation.Union or CsgOperation.Intersect or CsgOperation.Difference ? operation : CsgOperation.None;
             this.AddChild(shape1);
-            Left = shape1;
+            Left = shape1.Clone();
             this.AddChild(shape2);
-            Right = shape2;
+            Right = shape2.Clone();
         }
 
         public override bool Equals(object obj)

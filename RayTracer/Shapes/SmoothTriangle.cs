@@ -54,14 +54,24 @@ namespace RayTracer
         
         public SmoothTriangle(Point p1, Point p2, Point p3, Vector n1, Vector n2, Vector n3): base()
         {
+            UpdatePoints(p1, p2, p3);
+            UpdateNormals(n1, n2, n3);
+        }
+
+        public void UpdatePoints(Point p1, Point p2, Point p3)
+        {
             Vertex1 = p1;
             Vertex2 = p2;
             Vertex3 = p3;
+            Edge1 = p2 - p1;
+            Edge2 = p3 - p1;
+        }
+
+        public void UpdateNormals(Vector n1, Vector n2, Vector n3)
+        {
             Normal1 = n1;
             Normal2 = n2;
             Normal3 = n3;
-            Edge1 = p2 - p1;
-            Edge2 = p3 - p1;
         }
 
         public override bool Equals(object obj)

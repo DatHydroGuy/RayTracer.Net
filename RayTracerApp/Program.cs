@@ -32,6 +32,7 @@ namespace RayTracerApp
             // var chapter14NoAABB = new Chapter14NoAABB();
             // var chapter14SphereCubeNoAABB = new Chapter14SphereCubeNoAABB();
             // var chapter14SphereCubeAABB = new Chapter14SphereCubeAABB();
+            // var chapter14Groups = new Chapter14Groups();
             // var chapter15Triangles = new Chapter15Triangles();
             // var chapter15ObjTeapot = new Chapter15ObjTeapot();
             // var chapter15ObjNormals = new Chapter15ObjNormals();

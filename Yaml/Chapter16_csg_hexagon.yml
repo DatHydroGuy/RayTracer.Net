@@ -1,0 +1,151 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Chapter16_csg_hexagon_YAML2.ppm
+
+# ======================================================
+# definitions
+# ======================================================
+
+- define: cylinder-scaling
+  value:
+    - [ scale, 0.25, 1, 0.25 ]
+
+- define: hex-side
+  value:
+    add: csg
+    operation: union
+    left:
+      - add: sphere
+        transform:
+          - [scale, 0.25, 0.25, 0.25]
+          - [translate, 0, 0, -1]
+        material:
+          color: [ 1, 1, 1 ]
+    right:
+      - add: cylinder
+        minimum: 0
+        maximum: 1
+        closed: false
+        transform:
+          - cylinder-scaling
+          - [rotate-z, -1.5708]
+          - [rotate-y, -0.5236]
+          - [translate, 0, 0, -1]
+        material:
+          color: [ 1, 1, 1 ]
+
+- define: 2sides
+  value:
+    add: csg
+    operation: union
+    left:
+      - add: hex-side
+    right:
+      - add: hex-side
+        transform:
+          - [rotate-y, 1.0472]
+
+- define: 3sides
+  value:
+    add: csg
+    operation: union
+    left:
+      - add: 2sides
+    right:
+      - add: hex-side
+        transform:
+          - [rotate-y, 2.0944]
+
+
+- define: 4sides
+  value:
+    add: csg
+    operation: union
+    left:
+      - add: 3sides
+    right:
+      - add: hex-side
+        transform:
+          - [rotate-y, 3.1416]
+
+- define: 5sides
+  value:
+    add: csg
+    operation: union
+    left:
+      - add: 4sides
+    right:
+      - add: hex-side
+        transform:
+          - [rotate-y, 4.1888]
+
+- define: hexagon
+  value:
+    add: csg
+    operation: union
+    left:
+      - add: 5sides
+    right:
+      - add: hex-side
+        transform:
+          - [rotate-y, 5.236]
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 1000
+  height: 600
+  field-of-view: 1.047
+  from: [0, 2.5, -5]
+  to: [0, 0, 0]
+  up: [0, 1, 0]
+  show-progress: true
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-5, 3, -10]
+  intensity: [1, 1, 1]
+
+# ======================================================
+# the scene
+# ======================================================
+
+# the floor
+- add: plane
+  material:
+    pattern:
+      type: checker
+      colors:
+        - [1, 0.3, 0.7]
+        - [0.3, 1, 0.7]
+      transform:
+        - [ translate, 0.01, 0.01, 0.01 ]
+    specular: 0
+
+# the sky
+- add: plane
+  transform:
+    - [translate, 0, 5, 0]
+  material:
+    pattern:
+      type: double-gradient
+      colors:
+        - [0.8, 0.8, 1]
+        - [0.1, 0.1, 1]
+      transform:
+        - [ scale, 100000, 100000, 100000 ]
+    ambient: 0.9
+    specular: 0
+
+# group object
+- add: hexagon
+  transform:
+    - [ scale, 2, 2, 2 ]
+    - [translate, 0, 0.5, 0]
