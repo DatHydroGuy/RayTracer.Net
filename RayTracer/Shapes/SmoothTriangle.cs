@@ -96,7 +96,7 @@ namespace RayTracer.Shapes
             }
 
             var t = f * Edge2.Dot(originCrossEdge1);
-            return new[] {Intersection.IntersectionWithUV(t, this, u, v)};
+            return new[] {Intersection.IntersectionWithUv(t, this, u, v)};
         }
 
         public override Vector LocalNormalAt(Point objectPoint, Intersection intersect = null)

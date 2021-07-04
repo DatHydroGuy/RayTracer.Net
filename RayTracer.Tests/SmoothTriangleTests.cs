@@ -58,7 +58,7 @@ namespace RayTracer.Tests
         public void ASmoothTriangleUsesUAndVCoordinatesToInterpolateTheNormal()
         {
             // Arrange
-            var intersect = Intersection.IntersectionWithUV(1, t, 0.45, 0.25);
+            var intersect = Intersection.IntersectionWithUv(1, t, 0.45, 0.25);
             var expected = new Vector(-0.5547, 0.83205, 0);
 
             // Act
@@ -72,7 +72,7 @@ namespace RayTracer.Tests
         public void PreparingTheNormalOnASmoothTriangle()
         {
             // Arrange
-            var intersect = Intersection.IntersectionWithUV(1, t, 0.45, 0.25);
+            var intersect = Intersection.IntersectionWithUv(1, t, 0.45, 0.25);
             var ray = new Ray(new Point(-0.2, 0.3, -2), new Vector(0, 0, 1));
             var xs = Intersection.Intersections(intersect);
             var comps = intersect.PrepareComputations(ray, xs);

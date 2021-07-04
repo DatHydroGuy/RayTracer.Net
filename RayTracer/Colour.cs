@@ -2,31 +2,17 @@ namespace RayTracer
 {
     public class Colour
     {
-        public static Colour BLACK = new Colour(0, 0, 0);
-        public static Colour WHITE = new Colour(1, 1, 1);
-        public static Colour RED = new Colour(1, 0, 0);
-        public static Colour GREEN = new Colour(0, 1, 0);
-        public static Colour BLUE = new Colour(0, 0, 1);
+        public static readonly Colour BLACK = new(0, 0, 0);
+        public static readonly Colour WHITE = new(1, 1, 1);
+        public static readonly Colour RED = new(1, 0, 0);
+        public static readonly Colour GREEN = new(0, 1, 0);
+        public static readonly Colour BLUE = new(0, 0, 1);
 
-        private double _red;
-        private double _green;
-        private double _blue;
+        public double Red { get; private init; }
 
-        public double Red
-        {
-            get { return _red; }
-            set { _red = value; }
-        }
-        public double Green
-        {
-            get { return _green; }
-            set { _green = value; }
-        }
-        public double Blue
-        {
-            get { return _blue; }
-            set { _blue = value; }
-        }
+        public double Green { get; private init; }
+
+        public double Blue { get; private init; }
 
         public Colour(double red = 0.0, double green = 0.0, double blue = 0.0)
         {
@@ -48,12 +34,7 @@ namespace RayTracer
         public static bool operator==(Colour t1, Colour t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
-            {
-                return object.ReferenceEquals(t2, null);
-            }
-
-            return t1.Equals(t2);
+            return t1?.Equals(t2) ?? ReferenceEquals(t2, null);
         }
 
         public static bool operator!=(Colour t1, Colour t2)

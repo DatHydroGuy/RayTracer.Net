@@ -7,31 +7,13 @@ namespace RayTracer
 {
     public class Intersection
     {
-        private double _t;
-        private double _u;
-        private double _v;
-        private Shape _obj;
-        
-        public double T
-        {
-            get { return _t; }
-            set { _t = value; }
-        }
-        public double U
-        {
-            get { return _u; }
-            set { _u = value; }
-        }
-        public double V
-        {
-            get { return _v; }
-            set { _v = value; }
-        }
-        public Shape Obj
-        {
-            get { return _obj; }
-            set { _obj = value; }
-        }
+        public double T { get; }
+
+        public double U { get; private set; }
+
+        public double V { get; private set; }
+
+        public Shape Obj { get; }
 
         public Intersection(double t, Shape obj)
         {
@@ -43,9 +25,11 @@ namespace RayTracer
 
         public Comps PrepareComputations(Ray r, Intersection[] allIntersections = null)
         {
-            var comps = new Comps();
-            comps.T = T;
-            comps.Obj = Obj;
+            var comps = new Comps
+            {
+                T = T,
+                Obj = Obj
+            };
             comps.TargetPoint = r.Position(comps.T);
             comps.EyeVector = -r.Direction;
             comps.NormalVector = comps.Obj.NormalAt(comps.TargetPoint, this);
@@ -69,20 +53,15 @@ namespace RayTracer
             // Initialise the UnderPoint so that reflection and refraction rays can be cast
             comps.UnderPoint = comps.TargetPoint - comps.NormalVector * Utilities.EPSILON;
 
-            if (allIntersections == null)
-            {
-                allIntersections = new Intersection[] {this};
-            }
-            double n1;
-            double n2;
-            CalculateRefractiveNormals(allIntersections, out n1, out n2);
+            allIntersections ??= new[] { this };
+            CalculateRefractiveNormals(allIntersections, out var n1, out var n2);
             comps.N1 = n1;
             comps.N2 = n2;
 
             return comps;
         }
 
-        private void CalculateRefractiveNormals(Intersection[] allIntersections, out double n1, out double n2)
+        private void CalculateRefractiveNormals(IEnumerable<Intersection> allIntersections, out double n1, out double n2)
         {
             var containers = new List<Shape>();
             var n1Out = 1.0;
@@ -90,7 +69,7 @@ namespace RayTracer
 
             foreach (var intersection in allIntersections)
             {
-                if(Utilities.AlmostEqual(intersection.T, this.T))
+                if(Utilities.AlmostEqual(intersection.T, T))
                 {
                     if(containers.Count > 0)
                     {
@@ -107,25 +86,27 @@ namespace RayTracer
                     containers.Add(intersection.Obj);
                 }
 
-                if(Utilities.AlmostEqual(intersection.T, this.T))
+                if (!Utilities.AlmostEqual(intersection.T, T))
+                    continue;
+                
+                if(containers.Count > 0)
                 {
-                    if(containers.Count > 0)
-                    {
-                        n2Out = containers.Last().Material.RefractiveIndex;
-                    }
-                    break;
+                    n2Out = containers.Last().Material.RefractiveIndex;
                 }
+                break;
             }
 
             n1 = n1Out;
             n2 = n2Out;
         }
 
-        public static Intersection IntersectionWithUV(double time, Shape shape, double u, double v)
+        public static Intersection IntersectionWithUv(double time, Shape shape, double u, double v)
         {
-            var intersection = new Intersection(time, shape);
-            intersection.U = u;
-            intersection.V = v;
+            var intersection = new Intersection(time, shape)
+            {
+                U = u,
+                V = v
+            };
             return intersection;
         }
 
@@ -136,7 +117,7 @@ namespace RayTracer
 
         public static Intersection Hit(Intersection[] i)
         {
-            Array.Sort(i, new Comparison<Intersection>((x, y) => x.T.CompareTo(y.T)));
+            Array.Sort(i, (x, y) => x.T.CompareTo(y.T));
             return Array.Find(i, x => x.T >= 0);
         }
 

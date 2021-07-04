@@ -295,7 +295,7 @@ namespace RayTracer.Tests
             var s = new Triangle(new Point(0, 1, 0), new Point(-1, 0, 0), new Point(1, 0, 0));
 
             // Act
-            var i = Intersection.IntersectionWithUV(3.5, s, 0.2, 0.4);
+            var i = Intersection.IntersectionWithUv(3.5, s, 0.2, 0.4);
 
             // Assert
             Assert.Equal(0.2, i.U);
