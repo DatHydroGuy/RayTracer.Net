@@ -3,10 +3,10 @@ using Xunit;
 
 namespace RayTracer.Tests
 {
-    public class CSGTests
+    public class CsgTests
     {
         [Fact]
-        public void CreatingACSGWithAnOperationAnd2Shapes()
+        public void CreatingAcsgWithAnOperationAnd2Shapes()
         {
             // Arrange
             var s = new Sphere();
@@ -24,21 +24,21 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void EvaluatingTheRuleForCSGUnionOperation()
+        public void EvaluatingTheRuleForCsgUnionOperation()
         {
             // Arrange
             var csg = new Csg(CsgOperation.Union, new Cube(), new Cube());
-            var leftHits = new bool[] {true, true, true, true, false, false, false, false};
-            var insideLefts = new bool[] {true, true, false, false, true, true, false, false};
-            var insideRights = new bool[] {true, false, true, false, true, false, true, false};
-            var expecteds = new bool[] {false, true, false, true, false, false, true, true};
+            var leftHits = new[] {true, true, true, true, false, false, false, false};
+            var insideLefts = new[] {true, true, false, false, true, true, false, false};
+            var insideRights = new[] {true, false, true, false, true, false, true, false};
+            var expected = new[] {false, true, false, true, false, false, true, true};
             var allTestsPass = true;
 
-            for (int i = 0; i < expecteds.Length; i++)
+            for (var i = 0; i < expected.Length; i++)
             {
                 // Act
                 var result = csg.IntersectionAllowed(leftHits[i], insideLefts[i], insideRights[i]);
-                allTestsPass &= result == expecteds[i];
+                allTestsPass &= result == expected[i];
             }
 
             // Assert
@@ -46,21 +46,21 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void EvaluatingTheRuleForCSGIntersectOperation()
+        public void EvaluatingTheRuleForCsgIntersectOperation()
         {
             // Arrange
             var csg = new Csg(CsgOperation.Intersect, new Cube(), new Cube());
-            var leftHits = new bool[] {true, true, true, true, false, false, false, false};
-            var insideLefts = new bool[] {true, true, false, false, true, true, false, false};
-            var insideRights = new bool[] {true, false, true, false, true, false, true, false};
-            var expecteds = new bool[] {true, false, true, false, true, true, false, false};
+            var leftHits = new[] {true, true, true, true, false, false, false, false};
+            var insideLefts = new[] {true, true, false, false, true, true, false, false};
+            var insideRights = new[] {true, false, true, false, true, false, true, false};
+            var expected = new[] {true, false, true, false, true, true, false, false};
             var allTestsPass = true;
 
-            for (int i = 0; i < expecteds.Length; i++)
+            for (var i = 0; i < expected.Length; i++)
             {
                 // Act
                 var result = csg.IntersectionAllowed(leftHits[i], insideLefts[i], insideRights[i]);
-                allTestsPass &= result == expecteds[i];
+                allTestsPass &= result == expected[i];
             }
 
             // Assert
@@ -68,21 +68,21 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void EvaluatingTheRuleForCSGDifferenceOperation()
+        public void EvaluatingTheRuleForCsgDifferenceOperation()
         {
             // Arrange
             var csg = new Csg(CsgOperation.Difference, new Cube(), new Cube());
-            var leftHits = new bool[] {true, true, true, true, false, false, false, false};
-            var insideLefts = new bool[] {true, true, false, false, true, true, false, false};
-            var insideRights = new bool[] {true, false, true, false, true, false, true, false};
-            var expecteds = new bool[] {false, true, false, true, true, true, false, false};
+            var leftHits = new[] {true, true, true, true, false, false, false, false};
+            var insideLefts = new[] {true, true, false, false, true, true, false, false};
+            var insideRights = new[] {true, false, true, false, true, false, true, false};
+            var expected = new[] {false, true, false, true, true, true, false, false};
             var allTestsPass = true;
 
-            for (int i = 0; i < expecteds.Length; i++)
+            for (var i = 0; i < expected.Length; i++)
             {
                 // Act
                 var result = csg.IntersectionAllowed(leftHits[i], insideLefts[i], insideRights[i]);
-                allTestsPass &= result == expecteds[i];
+                allTestsPass &= result == expected[i];
             }
 
             // Assert
@@ -95,20 +95,20 @@ namespace RayTracer.Tests
             // Arrange
             var s = new Sphere();
             var c = new Cube();
-            var operations = new CsgOperation[] {CsgOperation.Union, CsgOperation.Intersect, CsgOperation.Difference};
-            var expectedX0s = new int[] {0, 1, 0};
-            var expectedX1s = new int[] {3, 2, 1};
+            var operations = new[] {CsgOperation.Union, CsgOperation.Intersect, CsgOperation.Difference};
+            var expectedX0Values = new[] {0, 1, 0};
+            var expectedX1Values = new[] {3, 2, 1};
             var allTestsPass = true;
 
-            for (int i = 0; i < expectedX0s.Length; i++)
+            for (var i = 0; i < expectedX0Values.Length; i++)
             {
                 // Act
                 var csg = new Csg(operations[i], s, c);
-                var xs = Intersection.Intersections(new Intersection[] {new Intersection(1, s), new Intersection(2, c), new Intersection(3, s), new Intersection(4, c)});
+                var xs = Intersection.Intersections(new Intersection(1, s), new Intersection(2, c), new Intersection(3, s), new Intersection(4, c));
                 var result = csg.FilterIntersections(xs);
                 allTestsPass &= result.Length == 2;
-                allTestsPass &= result[0] == xs[expectedX0s[i]];
-                allTestsPass &= result[1] == xs[expectedX1s[i]];
+                allTestsPass &= result[0] == xs[expectedX0Values[i]];
+                allTestsPass &= result[1] == xs[expectedX1Values[i]];
             }
 
             // Assert
@@ -116,7 +116,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void ARayMissesACSGObject()
+        public void ARayMissesACsgObject()
         {
             // Arrange
             var csg = new Csg(CsgOperation.Union, new Sphere(), new Cube());
@@ -130,12 +130,14 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void ARayHitsACSGObject()
+        public void ARayHitsACsgObject()
         {
             // Arrange
             var s1 = new Sphere();
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Translation(0, 0, 0.5);
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Translation(0, 0, 0.5)
+            };
             var csg = new Csg(CsgOperation.Union, s1, s2);
             var ray = new Ray(new Point(0, 0, -5), new Vector(0, 0, 1));
 
@@ -151,12 +153,14 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void ACSGHasABoundingBoxContainingAllOfItsChildObjects()
+        public void ACsgHasABoundingBoxContainingAllOfItsChildObjects()
         {
             // Arrange
             var s1 = new Sphere();
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Translation(2, 3, 4);
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Translation(2, 3, 4)
+            };
             var csg = new Csg(CsgOperation.Difference, s1, s2);
 
             // Act
@@ -168,7 +172,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void IntersectingARayWithACSGDoesntTestChildObjectsIfBoundingBoxIsMissed()
+        public void IntersectingARayWithACsgDoesntTestChildObjectsIfBoundingBoxIsMissed()
         {
             // Arrange
             var left = new TestShape();
@@ -185,7 +189,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void IntersectingARayWithACSGTestsChildObjectsIfBoundingBoxIsHit()
+        public void IntersectingARayWithACsgTestsChildObjectsIfBoundingBoxIsHit()
         {
             // Arrange
             var left = new TestShape();
@@ -202,20 +206,28 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void SubdividingACSGPartitionsItsChildObjects()
+        public void SubdividingACsgPartitionsItsChildObjects()
         {
             // Arrange
-            var s1 = new Sphere();
-            s1.Transform = Transformations.Translation(-1.5, 0, 0);
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Translation(1.5, 0, 0);
+            var s1 = new Sphere
+            {
+                Transform = Transformations.Translation(-1.5, 0, 0)
+            };
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Translation(1.5, 0, 0)
+            };
             var left = new Group();
             left.AddChildren(new Shape[] {s1, s2});
 
-            var s3 = new Sphere();
-            s3.Transform = Transformations.Translation(0, 0, -1.5);
-            var s4 = new Sphere();
-            s4.Transform = Transformations.Translation(0, 0, 1.5);
+            var s3 = new Sphere
+            {
+                Transform = Transformations.Translation(0, 0, -1.5)
+            };
+            var s4 = new Sphere
+            {
+                Transform = Transformations.Translation(0, 0, 1.5)
+            };
             var right = new Group();
             right.AddChildren(new Shape[] {s3, s4});
 
@@ -248,7 +260,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CloningACSG()
+        public void CloningACsg()
         {
             // Arrange
             var left = new TestShape();
@@ -274,7 +286,7 @@ namespace RayTracer.Tests
         public void StringRepresentation()
         {
             // Arrange
-            var expected = "[Type:RayTracer.Shapes.Csg, Origin:[X:0, Y:0, Z:0, W:1]\nParent:null\nOp:Intersect\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nChildren:\n[Type:RayTracer.Tests.TestShape\nId:637603259314317791\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603259314339500\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n[Type:RayTracer.Tests.TestShape\nId:637603259314337745\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603259314339500\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n]";
+            const string expected = "[Type:RayTracer.Shapes.Csg, Origin:[X:0, Y:0, Z:0, W:1]\nParent:null\nOp:Intersect\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nChildren:\n[Type:RayTracer.Tests.TestShape\nId:637603259314317791\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603259314339500\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n[Type:RayTracer.Tests.TestShape\nId:637603259314337745\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603259314339500\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n]";
             var orig = new Csg(CsgOperation.Intersect, new TestShape(), new TestShape());
 
             // Act

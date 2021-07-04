@@ -9,9 +9,9 @@ namespace RayTracer.Tests
         public void CreatingACamera()
         {
             // Arrange
-            var hSize = 160;
-            var vSize = 120;
-            var fieldOfView = Math.PI / 2.0;
+            const int hSize = 160;
+            const int vSize = 120;
+            const double fieldOfView = Math.PI / 2.0;
 
             // Act
             var c = new Camera(hSize, vSize, fieldOfView);
@@ -27,9 +27,9 @@ namespace RayTracer.Tests
         public void ThePixelSizeForAHorizontalCanvas()
         {
             // Arrange
-            var hSize = 200;
-            var vSize = 125;
-            var fieldOfView = Math.PI / 2.0;
+            const int hSize = 200;
+            const int vSize = 125;
+            const double fieldOfView = Math.PI / 2.0;
 
             // Act
             var c = new Camera(hSize, vSize, fieldOfView);
@@ -42,9 +42,9 @@ namespace RayTracer.Tests
         public void ThePixelSizeForAVerticalCanvas()
         {
             // Arrange
-            var hSize = 125;
-            var vSize = 200;
-            var fieldOfView = Math.PI / 2.0;
+            const int hSize = 125;
+            const int vSize = 200;
+            const double fieldOfView = Math.PI / 2.0;
 
             // Act
             var c = new Camera(hSize, vSize, fieldOfView);
@@ -85,10 +85,12 @@ namespace RayTracer.Tests
         public void ConstructingARayWhenTheCameraHasBeenTransformed()
         {
             // Arrange
-            var c = new Camera(201, 101, Math.PI / 2.0);
+            var c = new Camera(201, 101, Math.PI / 2.0)
+            {
+                Transform = Transformations.RotationY(Math.PI / 4.0) * Transformations.Translation(0, -2, 5)
+            };
 
             // Act
-            c.Transform = Transformations.RotationY(Math.PI / 4.0) * Transformations.Translation(0, -2, 5);
             var r = c.RayForPixel(100, 50);
 
             // Assert

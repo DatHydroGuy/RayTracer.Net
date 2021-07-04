@@ -138,7 +138,7 @@ namespace RayTracer.Tests
         public void StringRepresentation()
         {
             // Arrange
-            var expected = "[R:0.1, G:0.3, B:0.5]\n";
+            const string expected = "[R:0.1, G:0.3, B:0.5]\n";
             var orig = new Colour(0.1, 0.3, 0.5);
 
             // Act

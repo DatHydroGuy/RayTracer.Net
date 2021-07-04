@@ -17,9 +17,9 @@ namespace RayTracer.Tests
             Assert.Equal(10, c.Width);
             Assert.Equal(20, c.Height);
             var allBlack = true;
-            for (int y = 0; y < c.Height; y++)
+            for (var y = 0; y < c.Height; y++)
             {
-                for (int x = 0; x < c.Width; x++)
+                for (var x = 0; x < c.Width; x++)
                 {
                     allBlack &= c.Pixels[y, x] == new Colour(0, 0, 0);
                 }
@@ -52,7 +52,7 @@ namespace RayTracer.Tests
             c.WritePixel(-1, 4, new Colour());
 
             // Assert - Will not get to the following (always true) assertion if an error is thrown above
-            Assert.True(1 == 1);
+            Assert.True(true);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace RayTracer.Tests
 
             // Act
             var ppmContent = c.WriteToPpm();
-            using (StringReader sr = new StringReader(ppmContent))
+            using (var sr = new StringReader(ppmContent))
             {
                 result[0] = sr.ReadLine();
                 result[1] = sr.ReadLine();
@@ -96,7 +96,7 @@ namespace RayTracer.Tests
         {
             // Arrange
             var c = new Canvas(5, 3);
-            var expected = "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0\r\n0 0 0 0 0 0 0 128 0 0 0 0 0 0 0\r\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 255\r\n";
+            const string expected = "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0\r\n0 0 0 0 0 0 0 128 0 0 0 0 0 0 0\r\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 255\r\n";
             var c1 = new Colour(1.5, 0, 0);
             var c2 = new Colour(0, 0.5, 0);
             var c3 = new Colour(-0.5, 0, 1);
@@ -107,7 +107,7 @@ namespace RayTracer.Tests
             c.WritePixel(2, 1, c2);
             c.WritePixel(4, 2, c3);
             var ppmContent = c.WriteToPpm();
-            using (StringReader sr = new StringReader(ppmContent))
+            using (var sr = new StringReader(ppmContent))
             {
                 sr.ReadLine();
                 sr.ReadLine();
@@ -124,14 +124,14 @@ namespace RayTracer.Tests
         {
             // Arrange
             var c = new Canvas(10, 2);
-            var expected = "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\r\n153 255 204 153 255 204 153 255 204 153 255 204 153\r\n255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\r\n153 255 204 153 255 204 153 255 204 153 255 204 153\r\n";
+            const string expected = "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\r\n153 255 204 153 255 204 153 255 204 153 255 204 153\r\n255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\r\n153 255 204 153 255 204 153 255 204 153 255 204 153\r\n";
             var c1 = new Colour(1, 0.8, 0.6);
             string result;
 
             // Act
             c.SetColour(c1);
             var ppmContent = c.WriteToPpm();
-            using (StringReader sr = new StringReader(ppmContent))
+            using (var sr = new StringReader(ppmContent))
             {
                 sr.ReadLine();
                 sr.ReadLine();
@@ -148,12 +148,12 @@ namespace RayTracer.Tests
         {
             // Arrange
             var c = new Canvas(5, 3);
-            var expected = "\r\n";
+            const string expected = "\r\n";
             string result;
 
             // Act
             var ppmContent = c.WriteToPpm();
-            using (StringReader sr = new StringReader(ppmContent))
+            using (var sr = new StringReader(ppmContent))
             {
                 result = sr.ReadToEnd();
             }
