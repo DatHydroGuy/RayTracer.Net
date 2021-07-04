@@ -6,44 +6,34 @@ namespace RayTracer
 {
     public class World
     {
-        private Shape[] _objects;
-        private Light[] _lights;
+        public Shape[] Objects { get; set; }
 
-        public Shape[] Objects
-        {
-            get { return _objects; }
-            set { _objects = value; }
-        }
-        public Light[] Lights
-        {
-            get { return _lights; }
-            set { _lights = value; }
-        }
+        public Light[] Lights { get; set; }
 
         public World()
         {
-            Objects = new Shape[] {};
-            Lights = new Light[] {};
+            Objects = Array.Empty<Shape>();
+            Lights = Array.Empty<Light>();
         }
 
         public void AddShapeToWorld(Shape s)
         {
-            Objects = Utilities.Append<Shape>(Objects, s);
+            Objects = Utilities.Append(Objects, s);
         }
 
         public void AddShapesToWorld(Shape[] s)
         {
-            Objects = Utilities.AppendMany<Shape>(Objects, s);
+            Objects = Utilities.AppendMany(Objects, s);
         }
 
         public void AddLightToWorld(Light l)
         {
-            Lights = Utilities.Append<Light>(Lights, l);
+            Lights = Utilities.Append(Lights, l);
         }
 
         public void AddLightsToWorld(Light[] l)
         {
-            Lights = Utilities.AppendMany<Light>(Lights, l);
+            Lights = Utilities.AppendMany(Lights, l);
         }
 
         public Intersection[] IntersectWorld(Ray r)
@@ -53,7 +43,7 @@ namespace RayTracer
             {
                 intersections.AddRange(obj.Intersects(r));
             }
-            intersections.Sort(new Comparison<Intersection>((x, y) => x.T.CompareTo(y.T)));
+            intersections.Sort((x, y) => x.T.CompareTo(y.T));
             return intersections.ToArray();
         }
 
@@ -61,9 +51,9 @@ namespace RayTracer
         {
             var hitColour = new Colour(0, 0, 0);
 
-            foreach (Light light in Lights)
+            foreach (var light in Lights)
             {
-                bool isInShadow = IsShadowed(comps.OverPoint, light);
+                var isInShadow = IsShadowed(comps.OverPoint, light);
                 hitColour += comps.Obj.Material.Lighting(comps.Obj, light, comps.OverPoint, comps.EyeVector, comps.NormalVector, isInShadow);
                 var reflectedColour = ReflectedColour(comps, remainingReflections);    // Add any reflected colour into base colour
                 var refractedColour = RefractedColour(comps, remainingReflections);    // Add any refracted colour into base colour
@@ -94,11 +84,9 @@ namespace RayTracer
             {
                 return new Colour(0, 0, 0);
             }
-            else
-            {
-                var comps = hit.PrepareComputations(r, intersections);
-                return ShadeHit(comps, remainingReflections);
-            }
+
+            var comps = hit.PrepareComputations(r, intersections);
+            return ShadeHit(comps, remainingReflections);
         }
 
         public Colour ReflectedColour(Comps comps, int remainingReflections = 5)
@@ -170,27 +158,29 @@ namespace RayTracer
             var hit = Intersection.Hit(intersections);
 
             // If a hit exists and is closer than the light source, then the point is in shadow
-            if (hit != null && hit.T < shadowVectorDistance && hit.Obj.Material.CastsShadow)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return hit != null && hit.T < shadowVectorDistance && hit.Obj.Material.CastsShadow;
         }
 
         public static World DefaultWorld()
         {
-            var w = new World();
-            w.Lights = new Light[] {Light.PointLight(new Point(-10, 10, -10), new Colour(1, 1, 1))};
-            var s1 = new Sphere();
-            s1.Material.Colour = new Colour(0.8, 1, 0.6);
-            s1.Material.Diffuse = 0.7;
-            s1.Material.Specular = 0.2;
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Scaling(0.5, 0.5, 0.5);
-            w.Objects = new Sphere[] {s1, s2};
+            var w = new World
+            {
+                Lights = new[] {Light.PointLight(new Point(-10, 10, -10), new Colour(1, 1, 1))}
+            };
+            var s1 = new Sphere
+            {
+                Material =
+                {
+                    Colour = new Colour(0.8, 1, 0.6),
+                    Diffuse = 0.7,
+                    Specular = 0.2
+                }
+            };
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Scaling(0.5, 0.5, 0.5)
+            };
+            w.Objects = new Shape[] {s1, s2};
             return w;
         }
     }

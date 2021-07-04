@@ -2,19 +2,9 @@ namespace RayTracer
 {
     public class Light
     {
-        private Point _position;
-        private Colour _intensity;
+        public Point Position { get; }
 
-        public Point Position
-        {
-            get { return _position; }
-            set { _position = value; }
-        }
-        public Colour Intensity
-        {
-            get { return _intensity; }
-            set { _intensity = value; }
-        }
+        public Colour Intensity { get; }
 
         public Light(Point position, Colour intensity)
         {
@@ -34,12 +24,7 @@ namespace RayTracer
         public static bool operator==(Light t1, Light t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
-            {
-                return object.ReferenceEquals(t2, null);
-            }
-
-            return t1.Equals(t2);
+            return t1?.Equals(t2) ?? ReferenceEquals(t2, null);
         }
 
         public static bool operator!=(Light t1, Light t2)
@@ -49,12 +34,12 @@ namespace RayTracer
 
         public override int GetHashCode()
         {
-            return (int)(Position.GetHashCode() * 3 + Intensity.GetHashCode() * 2);
+            return Position.GetHashCode() * 3 + Intensity.GetHashCode() * 2;
         }
 
         public override string ToString()
         {
-            return $"Light:[Position:{Position.ToString()}Intensity:{Intensity.ToString()}]\n";
+            return $"Light:[Position:{Position}Intensity:{Intensity}]\n";
         }
 
         public static Light PointLight(Point position, Colour intensity)

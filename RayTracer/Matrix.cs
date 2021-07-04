@@ -2,30 +2,16 @@ namespace RayTracer
 {
     public class Matrix
     {
-        private int _width;
-        private int _height;
-        private double[,] _data;
+        private int Width { get; }
 
-        public int Width
-        {
-            get { return _width; }
-            set { _width = value; }
-        }
-        public int Height
-        {
-            get { return _height; }
-            set { _height = value; }
-        }
-        public double[,] Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
+        private int Height { get; }
 
-        public Matrix(int size = 4): this(size, size)
+        public double[,] Data { get; }
+
+        private Matrix(int size = 4): this(size, size)
         {}
 
-        public Matrix(int width = 4, int height = 4)
+        private Matrix(int width = 4, int height = 4)
         {
             Width = width;
             Height = height;
@@ -80,13 +66,16 @@ namespace RayTracer
         
         public override bool Equals(object obj)
         {
-            var other = obj as Matrix;
-
-            bool areEqual = other.Data != null;
-
-            for (int y = 0; y < Height; y++)
+            if (obj is not Matrix other || other.Data == null)
             {
-                for (int x = 0; x < Width; x++)
+                return false;
+            }
+
+            var areEqual = other.Data != null;
+
+            for (var y = 0; y < Height; y++)
+            {
+                for (var x = 0; x < Width; x++)
                 {
                     areEqual &= Utilities.AlmostEqual(Data[y, x], other.Data[y, x]);
                 }
@@ -98,17 +87,12 @@ namespace RayTracer
         public static bool operator==(Matrix t1, Matrix t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
+            if(ReferenceEquals(t1, null))
             {
-                return object.ReferenceEquals(t2, null);
+                return ReferenceEquals(t2, null);
             }
 
-            if(object.ReferenceEquals(t2, null))
-            {
-                return false;
-            }
-
-            return t1.Equals(t2);
+            return !ReferenceEquals(t2, null) && t1.Equals(t2);
         }
 
         public static bool operator!=(Matrix t1, Matrix t2)
@@ -119,11 +103,11 @@ namespace RayTracer
         public override int GetHashCode()
         {
             var hashValue = 0.0;
-            var sixteenPrimes = new int[] {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53};
+            var sixteenPrimes = new[] {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53};
 
-            for (int y = 0; y < Height; y++)
+            for (var y = 0; y < Height; y++)
             {
-                for (int x = 0; x < Width; x++)
+                for (var x = 0; x < Width; x++)
                 {
                     var primeIndex = y * Height + x;
                     hashValue += Data[y, x] * sixteenPrimes[primeIndex];
@@ -149,11 +133,11 @@ namespace RayTracer
             }
 
             var result = new Matrix(m2.Width, m1.Height);
-            for (int y = 0; y < m1.Height; y++)
+            for (var y = 0; y < m1.Height; y++)
             {
-                for (int x = 0; x < m2.Width; x++)
+                for (var x = 0; x < m2.Width; x++)
                 {
-                    for (int idx = 0; idx < m1.Width; idx++)
+                    for (var idx = 0; idx < m1.Width; idx++)
                     {
                         result.Data[y, x] += m1.Data[y, idx] * m2.Data[idx, x];
                     }
@@ -198,7 +182,7 @@ namespace RayTracer
         public static Matrix Identity(int size)
         {
             var m = new Matrix(size);
-            for (int i = 0; i < size; i++)
+            for (var i = 0; i < size; i++)
             {
                 m.Data[i, i] = 1;
             }
@@ -218,9 +202,9 @@ namespace RayTracer
         public Matrix Transpose()
         {
             var m = new Matrix(Height, Width);
-            for (int y = 0; y < Height; y++)
+            for (var y = 0; y < Height; y++)
             {
-                for (int x = 0; x < Width; x++)
+                for (var x = 0; x < Width; x++)
                 {
                     m.Data[x, y] = Data[y, x];
                 }
@@ -242,7 +226,7 @@ namespace RayTracer
             else
             {
                 var result = 0.0;
-                for (int i = 0; i < Width; i++)
+                for (var i = 0; i < Width; i++)
                 {
                     result += Data[0, i] * Cofactor(0, i);
                 }
@@ -253,19 +237,17 @@ namespace RayTracer
         public Matrix Submatrix(int row, int column)
         {
             var result = new Matrix(Height - 1, Width - 1);
-            for (int y = 0; y < Height; y++)
+            for (var y = 0; y < Height; y++)
             {
-                if (y != row)
+                if (y == row)
+                    continue;
+                var targetY = y < row ? y : y - 1;
+                for (var x = 0; x < Width; x++)
                 {
-                    var targetY = y < row ? y : y - 1;
-                    for (int x = 0; x < Width; x++)
-                    {
-                        if (x != column)
-                        {
-                            var targetX = x <= column ? x : x - 1;
-                            result.Data[targetY, targetX] = Data[y, x];
-                        }
-                    }
+                    if (x == column)
+                        continue;
+                    var targetX = x <= column ? x : x - 1;
+                    result.Data[targetY, targetX] = Data[y, x];
                 }
             }
 
@@ -294,9 +276,9 @@ namespace RayTracer
             }
 
             var result = new Matrix(Width, Height);
-            for (int y = 0; y < Height; y++)
+            for (var y = 0; y < Height; y++)
             {
-                for (int x = 0; x < Width; x++)
+                for (var x = 0; x < Width; x++)
                 {
                     var c = Cofactor(y, x);
                     result.Data[x, y] = c / determinant;

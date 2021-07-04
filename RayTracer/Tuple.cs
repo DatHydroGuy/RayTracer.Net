@@ -4,33 +4,15 @@ namespace RayTracer
 {
     public abstract class Tuple
     {
-        private double _x;
-        private double _y;
-        private double _z;
-        private double _w;
+        public double X { get; set; }
 
-        public double X
-        {
-            get { return _x; }
-            set { _x = value; }
-        }
-        public double Y
-        {
-            get { return _y; }
-            set { _y = value; }
-        }
-        public double Z
-        {
-            get { return _z; }
-            set { _z = value; }
-        }
-        public double W
-        {
-            get { return _w; }
-            set { _w = value; }
-        }
+        public double Y { get; set; }
 
-        public Tuple(double x = 0.0, double y = 0.0, double z = 0.0, double w = 0.0)
+        public double Z { get; set; }
+
+        public double W { get; set; }
+
+        protected Tuple(double x = 0.0, double y = 0.0, double z = 0.0, double w = 0.0)
         {
             X = x;
             Y = y;
@@ -52,12 +34,7 @@ namespace RayTracer
         public static bool operator==(Tuple t1, Tuple t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
-            {
-                return object.ReferenceEquals(t2, null);
-            }
-
-            return t1.Equals(t2);
+            return t1?.Equals(t2) ?? ReferenceEquals(t2, null);
         }
 
         public static bool operator!=(Tuple t1, Tuple t2)
@@ -74,8 +51,6 @@ namespace RayTracer
         {
             return $"[X:{X}, Y:{Y}, Z:{Z}, W:{W}]\n";
         }
-
-        public abstract Tuple Clone();
 
         public double Magnitude()
         {

@@ -6,67 +6,25 @@ namespace RayTracer
 {
     public class Material
     {
-        private Colour _colour;
-        private double _ambient;
-        private double _diffuse;
-        private double _specular;
-        private double _shininess;
-        private double _reflective;
-        private double _transparency;
-        private double _refractiveIndex;
-        private bool _castsShadow;
-        private Pattern _pattern;
-        
-        public Colour Colour
-        {
-            get { return _colour; }
-            set { _colour = value; }
-        }
-        public double Ambient
-        {
-            get { return _ambient; }
-            set { _ambient = value; }
-        }
-        public double Diffuse
-        {
-            get { return _diffuse; }
-            set { _diffuse = value; }
-        }
-        public double Specular
-        {
-            get { return _specular; }
-            set { _specular = value; }
-        }
-        public double Shininess
-        {
-            get { return _shininess; }
-            set { _shininess = value; }
-        }
-        public double Reflective
-        {
-            get { return _reflective; }
-            set { _reflective = value; }
-        }
-        public double Transparency
-        {
-            get { return _transparency; }
-            set { _transparency = value; }
-        }
-        public double RefractiveIndex
-        {
-            get { return _refractiveIndex; }
-            set { _refractiveIndex = value; }
-        }
-        public bool CastsShadow
-        {
-            get { return _castsShadow; }
-            set { _castsShadow = value; }
-        }
-        public Pattern Pattern
-        {
-            get { return _pattern; }
-            set { _pattern = value; }
-        }
+        public Colour Colour { get; set; }
+
+        public double Ambient { get; set; }
+
+        public double Diffuse { get; set; }
+
+        public double Specular { get; set; }
+
+        public double Shininess { get; set; }
+
+        public double Reflective { get; set; }
+
+        public double Transparency { get; set; }
+
+        public double RefractiveIndex { get; set; }
+
+        public bool CastsShadow { get; set; }
+
+        public Pattern Pattern { get; set; }
 
         public Material()
         {
@@ -101,12 +59,7 @@ namespace RayTracer
         public static bool operator==(Material m1, Material m2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(m1, null))
-            {
-                return object.ReferenceEquals(m2, null);
-            }
-
-            return m1.Equals(m2);
+            return m1?.Equals(m2) ?? ReferenceEquals(m2, null);
         }
 
         public static bool operator!=(Material m1, Material m2)
@@ -116,14 +69,14 @@ namespace RayTracer
 
         public override int GetHashCode()
         {
-            int shadowContrib = CastsShadow ? 1 : -1;
+            var shadowContrib = CastsShadow ? 1 : -1;
             return (int)(Ambient * 2 + Diffuse * 3 + Specular * 5 + Shininess * 7 + Reflective * 11 + Transparency * 13 + RefractiveIndex * 17 + shadowContrib * 19);
         }
 
         public override string ToString()
         {
             var pattern = Pattern == null ? "null\n" : Pattern.ToString();
-            return $"[Colour:{Colour.ToString()}Amb:{Ambient},Dif:{Diffuse},Spec:{Specular},Shin:{Shininess},Refl:{Reflective},Tran:{Transparency},Refr:{RefractiveIndex},Shad:{CastsShadow},\nPattern:{pattern}]\n";
+            return $"[Colour:{Colour}Amb:{Ambient},Dif:{Diffuse},Spec:{Specular},Shin:{Shininess},Refl:{Reflective},Tran:{Transparency},Refr:{RefractiveIndex},Shad:{CastsShadow},\nPattern:{pattern}]\n";
         }
 
         public Material Clone()
@@ -159,28 +112,29 @@ namespace RayTracer
 
             var diffuse = new Colour(0, 0, 0);
             var specular = new Colour(0, 0, 0);
-
+            
+            // TODO: If isInShadow = true, calculate new light ray from targetPoint for transparent materials
             // If dot product of light and normal vectors is negative, light is on other side of surface
             var lightDotNormal = lightVector.Dot(normalVector);
-            if (lightDotNormal >= 0 && !isInShadow)     // TODO: If isInShadow = true, calculate new light ray from targetPoint for transparent materials
+            if (!(lightDotNormal >= 0) || isInShadow)
+                return ambient + diffuse + specular;
+
+            // Calculate diffuse contribution
+            diffuse = effectiveColour * Diffuse * lightDotNormal;
+
+            // If dot product of reflection vector and eye vector is negative, light reflects away from the eye
+            var reflectionVector = -lightVector.Reflect(normalVector);
+            var reflectDotEye = reflectionVector.Dot(eyeVector);
+
+            if (reflectDotEye < 0)
             {
-                // Calculate diffuse contribution
-                diffuse = effectiveColour * Diffuse * lightDotNormal;
-
-                // If dot product of reflection vector and eye vector is negative, light reflects away from the eye
-                var reflectionVector = -lightVector.Reflect(normalVector);
-                var reflectDotEye = reflectionVector.Dot(eyeVector);
-
-                if (reflectDotEye < 0)
-                {
-                    specular = new Colour(0, 0, 0);
-                }
-                else
-                {
-                    // Calculate specular contribution
-                    var factor = Math.Pow(reflectDotEye, Shininess);
-                    specular = light.Intensity * Specular * factor;
-                }
+                specular = new Colour(0, 0, 0);
+            }
+            else
+            {
+                // Calculate specular contribution
+                var factor = Math.Pow(reflectDotEye, Shininess);
+                specular = light.Intensity * Specular * factor;
             }
 
             // Add the three contributions together to get final shading

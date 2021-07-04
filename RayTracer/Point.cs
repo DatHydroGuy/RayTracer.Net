@@ -1,6 +1,6 @@
 namespace RayTracer
 {
-    public class Point: Tuple
+    public sealed class Point: Tuple
     {
         public Point(double x = 0.0, double y = 0.0, double z = 0.0, double w = 1) : base(x, y, z, 1)
         {
@@ -82,7 +82,7 @@ namespace RayTracer
             };
         }
 
-        public override Point Clone()
+        public Point Clone()
         {
             return new Point(X, Y, Z, W);
         }

@@ -281,7 +281,7 @@ namespace RayTracer.Tests
             var result = orig.ToString();
 
             // Assert
-            Assert.True(Utilities.ToStringEquals(expected, result));
+            Assert.True(TestUtilities.ToStringEquals(expected, result));
         }
     }
 }

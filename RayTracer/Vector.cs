@@ -1,6 +1,6 @@
 namespace RayTracer
 {
-    public class Vector: Tuple
+    public sealed class Vector: Tuple
     {
         public Vector(double x = 0.0, double y = 0.0, double z = 0.0, double w = 0) : base(x, y, z, 0)
         {
@@ -62,7 +62,7 @@ namespace RayTracer
             };
         }
 
-        public override Vector Clone()
+        public Vector Clone()
         {
             return new Vector(X, Y, Z, W);
         }

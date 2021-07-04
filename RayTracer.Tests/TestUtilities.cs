@@ -2,28 +2,41 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace RayTracer
+namespace RayTracer.Tests
 {
-    public static class Utilities
+    public static class TestUtilities
     {
-        public const double EPSILON = 0.00001;
-
-        public static bool AlmostEqual(double value1, double value2)
+        public static bool ToStringEquals(string s1, string s2)
         {
-                return Math.Abs(value1 - value2) < EPSILON;
+            var s1WithoutId = CutOutStrings(s1, "\nId:");
+            s1WithoutId = CutOutStrings(s1WithoutId, "\nParent:");
+            var s2WithoutId = CutOutStrings(s2, "\nId:");
+            s2WithoutId = CutOutStrings(s2WithoutId, "\nParent:");
+            return s1WithoutId == s2WithoutId;
         }
 
-        public static T[] Append<T>(T[] array, T item)
+        public static string CutOutStrings(string s, string stringToCut)
         {
-            return new List<T>(array) { item }.ToArray();
+            var sOld = "";
+            var sNew = s;
+            do
+            {
+                sOld = sNew;
+                sNew = CutOutString(sOld, stringToCut);
+            } while (sOld.Length != sNew.Length);
+
+            return sNew;
         }
 
-        public static T[] AppendMany<T>(T[] array, T[] items)
+        public static string CutOutString(string s, string stringToCut)
         {
-            var currentItems = new List<T>(array);
-            var newItems = new List<T>(items);
-            currentItems.AddRange(newItems);
-            return currentItems.ToArray();
+            var idStart = s.IndexOf(stringToCut);
+            if (idStart < 0)
+                return s;
+
+            var idEnd = s.IndexOf("\n", idStart + 2);
+
+            return s.Substring(0, idStart) + s.Substring(idEnd);
         }
 
         /*
@@ -31,11 +44,11 @@ namespace RayTracer
         */
         public static double[][] SolveCubic(double a, double b, double c, double d)
         {
-            var roots = new[] {new double[] {0, 0}, new double[] {0, 0}, new double[] {0, 0}};
+            var roots = new double[3][] {new double[2] {0, 0}, new double[2] {0, 0}, new double[2] {0, 0}};
 
-            var f = (3 * c / a - b * b / (a * a)) / 3.0;
-            var g = (2 * (b * b * b) / (a * a * a) - 9 * b * c / (a * a) + 27 * d / a) / 27.0;
-            var h = g * g / 4.0 + f * f * f / 27.0;
+            var f = ((3 * c / a) - (b * b / (a * a))) / 3.0;
+            var g = ((2 * (b * b * b) / (a * a * a)) - (9 * b * c / (a * a)) + (27 * d / a)) / 27.0;
+            var h = ((g * g) / 4.0) + ((f * f * f) / 27.0);
             
             if (h <= 0)
             {
@@ -49,7 +62,7 @@ namespace RayTracer
                 else
                 {
                     // There are 3 real roots
-                    var i = Math.Sqrt(g * g / 4.0 - h);
+                    var i = Math.Sqrt((g * g / 4.0) - h);
                     var j = Math.Cbrt(i);
                     var k = Math.Acos(-g / (2 * i));
                     var bigL = -j;
@@ -84,16 +97,16 @@ namespace RayTracer
         */
         public static double[] SolveQuartic(double a, double b, double c, double d, double e)
         {
-            var roots = new[] {new double[] {0, 0}, new double[] {0, 0}, new double[] {0, 0}, new double[] {0, 0}};
+            var roots = new double[4][] {new double[2] {0, 0}, new double[2] {0, 0}, new double[2] {0, 0}, new double[2] {0, 0}};
 
-            var f = c - b * b * 3.0 / 8.0;
+            var f = c - (b * b * 3.0 / 8.0);
             var g = d + b * b * b / 8.0 - b * c / 2.0;
             var h = e - b * b * b * b * 3.0 / 256.0 + b * b * c / 16.0 - b * d / 4.0;
 
-            var reducedCubicEquation = new[] {1, f / 2.0, (f * f - 4.0 * h) / 16.0, -g * g / 64.0};
+            var reducedCubicEquation = new double[4] {1, f / 2.0, (f * f - 4.0 * h) / 16.0, -g * g / 64.0};
             var rootsReducedCubic = SolveCubic(reducedCubicEquation[0], reducedCubicEquation[1], reducedCubicEquation[2], reducedCubicEquation[3]);
 
-            for (var i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 rootsReducedCubic[i][0] = Math.Round(rootsReducedCubic[i][0], 6, MidpointRounding.AwayFromZero);
                 rootsReducedCubic[i][1] = Math.Round(rootsReducedCubic[i][1], 6, MidpointRounding.AwayFromZero);
@@ -137,21 +150,23 @@ namespace RayTracer
                     var index = 0;
                     foreach (var x in rootsReducedCubic)
                     {
-                        if (!(x[0] < 0))
-                            continue;
-                        rootsReducedCubicSorted[index] = x;
-                        index += 1;
+                        if (x[0] < 0)
+                        {
+                            rootsReducedCubicSorted[index] = x;
+                            index += 1;
+                        }
                     }
                     foreach (var x in rootsReducedCubic)
                     {
-                        if (!(x[0] > 0))
-                            continue;
-                        rootsReducedCubicSorted[index] = x;
-                        index += 1;
+                        if (x[0] > 0)
+                        {
+                            rootsReducedCubicSorted[index] = x;
+                            index += 1;
+                        }
                     }
 
-                    var p = new[] {0, Math.Sqrt(Math.Abs(rootsReducedCubicSorted[0][0]))};
-                    var q = new[] {0, Math.Sqrt(Math.Abs(rootsReducedCubicSorted[1][0]))};
+                    var p = new double[] {0, Math.Sqrt(Math.Abs(rootsReducedCubicSorted[0][0]))};
+                    var q = new double[] {0, Math.Sqrt(Math.Abs(rootsReducedCubicSorted[1][0]))};
                     var pq = -1.0 * p[1] * q[1];
                     var r = -g / (8 * pq);
                     var s = b / (4 * a);
@@ -181,37 +196,43 @@ namespace RayTracer
             {
                 // Imaginary part exists in reduced cubic equation
                 // We don't want any imaginary solutions for our ray tracer, so return empty entries
-                return Array.Empty<double>();
+                return new double[] {};
             }
             
             var rootsList = new List<double[]>(roots);
             var nonImaginaryRoots = rootsList.Where(x => x[1] == 0).ToArray();
-            return nonImaginaryRoots.Select(t => t[0]).ToArray();
+            var results = new List<double>();
+            for (int i = 0; i < nonImaginaryRoots.Length; i++)
+            {
+                results.Add(nonImaginaryRoots[i][0]);
+            }
+            return results.ToArray();
         }
 
         /*
         Solve quadratic equations of the form ax^2 + bx + c = 0
         */
-        public static IEnumerable<double> Solve2(double coeffA, double coeffB, double coeffC)
+        public static double[] Solve2(double coeffA, double coeffB, double coeffC)
         {
             // Normal form: x^2 + px + q = 0
             var p = coeffB / (2.0 * coeffA);
             var q = coeffC / coeffA;
 
-            var det = p * p - q;
+            var D = p * p - q;
 
-            if(AlmostEqual(det, 0))
+            if(Utilities.AlmostEqual(D, 0))
             {
-                return new[] {-p, -p};
+                return new double[] {-p, -p};
             }
-
-            if (det < 0)
+            else if (D < 0)
             {
-                return Array.Empty<double>();
+                return new double[] {};
             }
-
-            var sqrtD = Math.Sqrt(det);
-            return new[] {-sqrtD - p, sqrtD - p};
+            else
+            {
+                var sqrtD = Math.Sqrt(D);
+                return new double[] {-sqrtD - p, sqrtD - p};
+            }
         }
 
         /*
@@ -220,23 +241,23 @@ namespace RayTracer
         public static double[] Solve3(double coeffA, double coeffB, double coeffC, double coeffD)
         {
             // Normal form: x^3 + Ax^2 + Bx + D = 0
-            var baRatio = coeffB / coeffA;
-            var caRatio = coeffC / coeffA;
-            var daRatio = coeffD / coeffA;
+            var A = coeffB / coeffA;
+            var B = coeffC / coeffA;
+            var C = coeffD / coeffA;
 
             // Substitute x = y - A / 3 to eliminate quadratic term: x^3 + px + q = 0
-            var aSquared = baRatio * baRatio;
-            var p = 1.0 / 3.0 * (-1.0 / 3.0 * aSquared + caRatio);
-            var q = 1.0 / 2.0 * (2.0 / 27.0 * baRatio * aSquared - 1.0 / 3.0 * baRatio * caRatio + daRatio);
+            var aSquared = A * A;
+            var p = 1.0 / 3.0 * (-1.0 / 3.0 * aSquared + B);
+            var q = 1.0 / 2.0 * (2.0 / 27.0 * A * aSquared - 1.0 / 3.0 * A * B + C);
 
             // Cardano's Formula:
             var pCubed = p * p * p;
-            var det = q * q + pCubed;
+            var D = q * q + pCubed;
             var s = new List<double>();
 
-            if(AlmostEqual(det, 0))
+            if(Utilities.AlmostEqual(D, 0))
             {
-                if(AlmostEqual(q, 0))
+                if(Utilities.AlmostEqual(q, 0))
                 {
                     // There is one single, triple solution
                     s.Add(0);
@@ -249,7 +270,7 @@ namespace RayTracer
                     s.Add(-u);
                 }
             }
-            else if (det < 0)
+            else if (D < 0)
             {
                 // 3 real, distinct solutions
                 var phi = 1.0 / 3.0 * Math.Acos(-q / Math.Sqrt(-pCubed));
@@ -261,37 +282,44 @@ namespace RayTracer
             else
             {
                 // Only 1 real solution
-                var sqrtD = Math.Sqrt(det);
+                var sqrtD = Math.Sqrt(D);
                 var u = Math.Cbrt(sqrtD - q);
                 var v = -Math.Cbrt(sqrtD + q);
                 s.Add(u + v);
             }
 
             // Resubstitute values back in
-            var sub = 1.0 / 3.0 * baRatio;
+            var sub = 1.0 / 3.0 * A;
 
-            return s.Select(item => item - sub).ToArray();
+            var results = new List<double>();
+
+            foreach (var item in s)
+            {
+                results.Add(item - sub);
+            }
+
+            return results.ToArray();
         }
 
         /*
         Solve quartic equations of the form ax^4 + bx^3 + cx^2 + dx + e = 0
         */
-        public static IEnumerable<double> Solve4(double coeffA, double coeffB, double coeffC, double coeffD, double coeffE)
+        public static double[] Solve4(double coeffA, double coeffB, double coeffC, double coeffD, double coeffE)
         {
             // Reduce to normal form: x^4 + Ax^3 + Bx^2 + Cx + D = 0
-            var baRatio = coeffB / coeffA;
-            var caRatio = coeffC / coeffA;
-            var daRatio = coeffD / coeffA;
-            var eaRatio = coeffE / coeffA;
+            var A = coeffB / coeffA;
+            var B = coeffC / coeffA;
+            var C = coeffD / coeffA;
+            var D = coeffE / coeffA;
 
             // Substitute x = y - A / 4 to eliminate the cubic term: x^4 + px^2 + qx + r = 0
-            var aSquared = baRatio * baRatio;
-            var p = -3.0 / 8.0 * aSquared + caRatio;
-            var q = 1.0 / 8.0 * aSquared * baRatio - 1.0 / 2.0 * baRatio * caRatio + daRatio;
-            var r = -3.0 / 256.0 * aSquared * aSquared + 1.0 / 16.0 * aSquared * caRatio - 1.0 / 4.0 * baRatio * daRatio + eaRatio;
+            var aSquared = A * A;
+            var p = -3.0 / 8.0 * aSquared + B;
+            var q = 1.0 / 8.0 * aSquared * A - 1.0 / 2.0 * A * B + C;
+            var r = -3.0 / 256.0 * aSquared * aSquared + 1.0 / 16.0 * aSquared * B - 1.0 / 4.0 * A * C + D;
             var s = new List<double>();
 
-            if (AlmostEqual(r, 0))
+            if (Utilities.AlmostEqual(r, 0))
             {
                 // There is no absolute term: y(y^3 + py + q) = 0
                 s.AddRange(Utilities.Solve3(1, 0, p, q));
@@ -300,7 +328,7 @@ namespace RayTracer
             else
             {
                 // Solve resolvent cubic equation
-                var cubicSolns = Solve3(1, -1.0 / 2.0 * p, -r, 1.0 / 2.0 * r * p - 1.0 / 8.0 * q * q);
+                var cubicSolns = Utilities.Solve3(1, -1.0 / 2.0 * p, -r, 1.0 / 2.0 * r * p - 1.0 / 8.0 * q * q);
 
                 // Take the single real solution...
                 var z = cubicSolns[0];
@@ -309,7 +337,7 @@ namespace RayTracer
                 var u = z * z - r;
                 var v = 2.0 * z - p;
 
-                if (AlmostEqual(u, 0))
+                if (Utilities.AlmostEqual(u, 0))
                 {
                     u = 0.0;
                 }
@@ -320,10 +348,10 @@ namespace RayTracer
                 else
                 {
                     // No roots
-                    return Array.Empty<double>();
+                    return new double[] {};
                 }
 
-                if (AlmostEqual(v, 0))
+                if (Utilities.AlmostEqual(v, 0))
                 {
                     v = 0.0;
                 }
@@ -334,7 +362,7 @@ namespace RayTracer
                 else
                 {
                     // No roots
-                    return Array.Empty<double>();
+                    return new double[] {};
                 }
 
                 // Solve first quadratic equation
@@ -345,9 +373,14 @@ namespace RayTracer
             }
 
             // Resubstitute values back in
-            var sub = 1.0 / 4.0 * baRatio;
+            var sub = 1.0 / 4.0 * A;
 
-            var results = s.Select(item => item - sub).ToList();
+            var results = new List<double>();
+
+            foreach (var item in s)
+            {
+                results.Add(item - sub);
+            }
 
             results.Sort();
             return results.ToArray();
