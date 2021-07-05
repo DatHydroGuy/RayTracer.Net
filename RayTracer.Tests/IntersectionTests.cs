@@ -160,8 +160,10 @@ namespace RayTracer.Tests
         {
             // Arrange
             var r = new Ray(new Point(0, 0, -5), new Vector(0, 0, 1));
-            var s = new Sphere();
-            s.Transform = Transformations.Translation(0, 0, 1);
+            var s = new Sphere
+            {
+                Transform = Transformations.Translation(0, 0, 1)
+            };
             var i = new Intersection(5, s);
 
             // Act
@@ -203,18 +205,18 @@ namespace RayTracer.Tests
             sphereC.Transform = Transformations.Translation(0, 0, 0.25);
             sphereC.Material.RefractiveIndex = 2.5;
             var r = new Ray(new Point(0, 0, -4), new Vector(0, 0, 1));
-            var expectedN1s = new double[] {1.0, 1.5, 2.0, 2.5, 2.5, 1.5};
-            var expectedN2s = new double[] {1.5, 2.0, 2.5, 2.5, 1.5, 1.0};
+            var expectedN1 = new[] {1.0, 1.5, 2.0, 2.5, 2.5, 1.5};
+            var expectedN2 = new[] {1.5, 2.0, 2.5, 2.5, 1.5, 1.0};
             var xs = Intersection.Intersections(new Intersection(2.0, sphereA), new Intersection(2.75, sphereB), new Intersection(3.25, sphereC),
-                                                new Intersection(4.75, sphereB), new Intersection(5.25, sphereC), new Intersection(6.0, sphereA));
-            bool testsPassing = true;
+                                                          new Intersection(4.75, sphereB), new Intersection(5.25, sphereC), new Intersection(6.0, sphereA));
+            var testsPassing = true;
 
-            for (int i = 0; i < 6; i++)
+            for (var i = 0; i < 6; i++)
             {
                 // Act
                 var comps = xs[i].PrepareComputations(r, xs);
-                testsPassing &= Utilities.AlmostEqual(expectedN1s[i], comps.N1);
-                testsPassing &= Utilities.AlmostEqual(expectedN2s[i], comps.N2);
+                testsPassing &= Utilities.AlmostEqual(expectedN1[i], comps.N1);
+                testsPassing &= Utilities.AlmostEqual(expectedN2[i], comps.N2);
             }
 
             // Assert

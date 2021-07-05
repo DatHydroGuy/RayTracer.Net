@@ -76,10 +76,14 @@ namespace RayTracer.Tests
             // Arrange
             var g = new Group();
             var s1 = new Sphere();
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Translation(0, 0, -3);
-            var s3 = new Sphere();
-            s3.Transform = Transformations.Translation(5, 0, 0);
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Translation(0, 0, -3)
+            };
+            var s3 = new Sphere
+            {
+                Transform = Transformations.Translation(5, 0, 0)
+            };
             g.AddChild(s1);
             g.AddChild(s2);
             g.AddChild(s3);
@@ -100,10 +104,14 @@ namespace RayTracer.Tests
         public void IntersectingARayWithATransformedGroup()
         {
             // Arrange
-            var g = new Group();
-            g.Transform = Transformations.Scaling(2, 2, 2);
-            var s = new Sphere();
-            s.Transform = Transformations.Translation(5, 0, 0);
+            var g = new Group
+            {
+                Transform = Transformations.Scaling(2, 2, 2)
+            };
+            var s = new Sphere
+            {
+                Transform = Transformations.Translation(5, 0, 0)
+            };
             g.AddChild(s);
             var r = new Ray(new Point(10, 0, -10), new Vector(0, 0, 1));
 
@@ -119,13 +127,17 @@ namespace RayTracer.Tests
         {
             // Arrange
             var g = new Group();
-            var s = new Sphere();
-            s.Transform = Transformations.Translation(2, 5, -3) * Transformations.Scaling(2, 2, 2);
+            var s = new Sphere
+            {
+                Transform = Transformations.Translation(2, 5, -3) * Transformations.Scaling(2, 2, 2)
+            };
             g.AddChild(s);
-            var c = new Cylinder();
-            c.Minimum = -2;
-            c.Maximum = 2;
-            c.Transform = Transformations.Translation(-4, -1, 4) * Transformations.Scaling(0.5, 1, 0.5);
+            var c = new Cylinder
+            {
+                Minimum = -2,
+                Maximum = 2,
+                Transform = Transformations.Translation(-4, -1, 4) * Transformations.Scaling(0.5, 1, 0.5)
+            };
             g.AddChild(c);
 
             // Act
@@ -172,8 +184,10 @@ namespace RayTracer.Tests
         public void SetMaterialSetsTheMaterialOnTheGroup()
         {
             // Arrange
-            var groupMaterial = new Material();
-            groupMaterial.Colour = Colour.RED;
+            var groupMaterial = new Material
+            {
+                Colour = Colour.RED
+            };
             var g = new Group();
 
             // Act
@@ -187,16 +201,24 @@ namespace RayTracer.Tests
         public void SetMaterialSetsTheMaterialOnGroupChildObjects()
         {
             // Arrange
-            var shapeMaterial = new Material();
-            shapeMaterial.Colour = Colour.BLUE;
-            var groupMaterial = new Material();
-            groupMaterial.Colour = Colour.RED;
+            var shapeMaterial = new Material
+            {
+                Colour = Colour.BLUE
+            };
+            var groupMaterial = new Material
+            {
+                Colour = Colour.RED
+            };
 
             var g = new Group();
-            var s1 = new Cube();
-            s1.Material = shapeMaterial;
-            var s2 = new Sphere();
-            s2.Material = shapeMaterial;
+            var s1 = new Cube
+            {
+                Material = shapeMaterial
+            };
+            var s2 = new Sphere
+            {
+                Material = shapeMaterial
+            };
 
             g.AddChild(s1);
             g.AddChild(s2);
@@ -213,19 +235,29 @@ namespace RayTracer.Tests
         public void SetMaterialSetsTheMaterialOnGroupDescendantObjects()
         {
             // Arrange
-            var shapeMaterial = new Material();
-            shapeMaterial.Colour = Colour.BLUE;
-            var groupMaterial = new Material();
-            groupMaterial.Colour = Colour.RED;
+            var shapeMaterial = new Material
+            {
+                Colour = Colour.BLUE
+            };
+            var groupMaterial = new Material
+            {
+                Colour = Colour.RED
+            };
 
             var g1 = new Group();
             var g2 = new Group();
-            var s1 = new Cube();
-            s1.Material = shapeMaterial;
-            var s2 = new Sphere();
-            s2.Material = shapeMaterial;
-            var s3 = new Cone();
-            s3.Material = shapeMaterial;
+            var s1 = new Cube
+            {
+                Material = shapeMaterial
+            };
+            var s2 = new Sphere
+            {
+                Material = shapeMaterial
+            };
+            var s3 = new Cone
+            {
+                Material = shapeMaterial
+            };
 
             g1.AddChild(s1);
             g2.AddChild(s2);
@@ -247,21 +279,33 @@ namespace RayTracer.Tests
         public void SetMaterialCanBeCalledAtAnyLevelOfAGroupHierarchy()
         {
             // Arrange
-            var shapeMaterial = new Material();
-            shapeMaterial.Colour = Colour.BLUE;
-            var groupMaterial = new Material();
-            groupMaterial.Colour = Colour.RED;
-            var groupMaterial2 = new Material();
-            groupMaterial2.Colour = Colour.GREEN;
+            var shapeMaterial = new Material
+            {
+                Colour = Colour.BLUE
+            };
+            var groupMaterial = new Material
+            {
+                Colour = Colour.RED
+            };
+            var groupMaterial2 = new Material
+            {
+                Colour = Colour.GREEN
+            };
 
             var g1 = new Group();
             var g2 = new Group();
-            var s1 = new Cube();
-            s1.Material = shapeMaterial;
-            var s2 = new Sphere();
-            s2.Material = shapeMaterial;
-            var s3 = new Cone();
-            s3.Material = shapeMaterial;
+            var s1 = new Cube
+            {
+                Material = shapeMaterial
+            };
+            var s2 = new Sphere
+            {
+                Material = shapeMaterial
+            };
+            var s3 = new Cone
+            {
+                Material = shapeMaterial
+            };
 
             g1.AddChild(s1);
             g2.AddChild(s2);
@@ -284,18 +328,20 @@ namespace RayTracer.Tests
         public void PartitioningAGroupsChildObjects()
         {
             // Arrange
-            var s1 = new Sphere();
-            s1.Transform = Transformations.Translation(-2, 0, 0);
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Translation(2, 0, 0);
+            var s1 = new Sphere
+            {
+                Transform = Transformations.Translation(-2, 0, 0)
+            };
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Translation(2, 0, 0)
+            };
             var s3 = new Sphere();
             var g = new Group();
             g.AddChildren(new Shape[] {s1, s2, s3});
-            Group left;
-            Group right;
 
             // Act
-            g.PartitionChildObjects(out left, out right);
+            g.PartitionChildObjects(out var left, out var right);
 
             // Assert
             Assert.Single(g.Shapes);
@@ -328,12 +374,18 @@ namespace RayTracer.Tests
         public void SubdividingAGroupPartitionsItsChildObjects()
         {
             // Arrange
-            var s1 = new Sphere();
-            s1.Transform = Transformations.Translation(-2, -2, 0);
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Translation(-2, 2, 0);
-            var s3 = new Sphere();
-            s3.Transform = Transformations.Scaling(4, 4, 4);
+            var s1 = new Sphere
+            {
+                Transform = Transformations.Translation(-2, -2, 0)
+            };
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Translation(-2, 2, 0)
+            };
+            var s3 = new Sphere
+            {
+                Transform = Transformations.Scaling(4, 4, 4)
+            };
             var g = new Group();
             g.AddChildren(new Shape[] {s1, s2, s3});
 
@@ -343,16 +395,16 @@ namespace RayTracer.Tests
             // Assert
             Assert.Equal(2, g.Shapes.Count);                    // Original group now only has 2 children...
             Assert.Equal(s3, g.Shapes[0]);                      // ...First child is s3...
-            Assert.IsType<Group>(g.Shapes[1]);                  // ...Second child is a group
+            Assert.IsType<Group>(g.Shapes[1]);                              // ...Second child is a group
             var subGroup = (Group)g.Shapes[1];
             Assert.Equal(2, subGroup.Shapes.Count);             // The subgroup contains two children...
-            Assert.IsType<Group>(subGroup.Shapes[0]);           // ...First child is a group...
+            Assert.IsType<Group>(subGroup.Shapes[0]);                       // ...First child is a group...
             var subSubGroup1 = (Group)subGroup.Shapes[0];
-            Assert.Single(subSubGroup1.Shapes);                 // ...Containing a single child...
+            Assert.Single(subSubGroup1.Shapes);                             // ...Containing a single child...
             Assert.Equal(s1, subSubGroup1.Shapes[0]);           // ...s1
-            Assert.IsType<Group>(subGroup.Shapes[1]);           // The second child of the original subgroup is also a group...
+            Assert.IsType<Group>(subGroup.Shapes[1]);                       // The second child of the original subgroup is also a group...
             var subSubGroup2 = (Group)subGroup.Shapes[1];
-            Assert.Single(subSubGroup2.Shapes);                 // ...Containing a single child...
+            Assert.Single(subSubGroup2.Shapes);                             // ...Containing a single child...
             Assert.Equal(s2, subSubGroup2.Shapes[0]);           // ...s2
         }
 
@@ -360,12 +412,18 @@ namespace RayTracer.Tests
         public void SubdividingAGroupWithTooFewChildObjects()
         {
             // Arrange
-            var s1 = new Sphere();
-            s1.Transform = Transformations.Translation(-2, 0, 0);
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Translation(2, 1, 0);
-            var s3 = new Sphere();
-            s3.Transform = Transformations.Translation(2, -1, 0);
+            var s1 = new Sphere
+            {
+                Transform = Transformations.Translation(-2, 0, 0)
+            };
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Translation(2, 1, 0)
+            };
+            var s3 = new Sphere
+            {
+                Transform = Transformations.Translation(2, -1, 0)
+            };
             var subGroup = new Group();
             subGroup.AddChildren(new Shape[] {s1, s2, s3});
             var s4 = new Sphere();
@@ -412,7 +470,7 @@ namespace RayTracer.Tests
         public void StringRepresentation()
         {
             // Arrange
-            var expected = "Type:RayTracer.Shapes.Group, Origin:[X:0, Y:0, Z:0, W:1]\nParent:null\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nChildren:\n[Type:RayTracer.Tests.TestShape\nId:637603307156449547\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603307156427896\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n[Type:RayTracer.Tests.TestShape\nId:637603307156449806\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603307156427896\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n";
+            const string expected = "Type:RayTracer.Shapes.Group, Origin:[X:0, Y:0, Z:0, W:1]\nParent:null\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nChildren:\n[Type:RayTracer.Tests.TestShape\nId:637603307156449547\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603307156427896\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n[Type:RayTracer.Tests.TestShape\nId:637603307156449806\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:637603307156427896\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]\n";
             var orig = new Group();
             var s1 = new TestShape();
             var s2 = new TestShape();

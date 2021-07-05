@@ -98,9 +98,9 @@ namespace RayTracer
             }
         }
 
-        private void FanTriangulate(int[] vertices, Group currGroup, int[] normals = null)
+        private void FanTriangulate(IReadOnlyList<int> vertices, Group currGroup, IReadOnlyList<int> normals = null)
         {
-            for (var i = 2; i < vertices.Length; i++)
+            for (var i = 2; i < vertices.Count; i++)
             {
                 Shape newFace;
                 if (normals == null)

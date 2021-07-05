@@ -5,7 +5,7 @@ namespace RayTracer.Tests
     public class MatrixTests
     {
         [Fact]
-        public void ConstructingAndInspectingA4x4Matrix()
+        public void ConstructingAndInspectingA4X4Matrix()
         {
             // Arrange
             var m = new Matrix(1, 2, 3, 4, 5.5, 6.5, 7.5, 8.5, 9, 10, 11, 12, 13.5, 14.5, 15.5, 16.5);
@@ -23,7 +23,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void ConstructingAndInspectingA3x3Matrix()
+        public void ConstructingAndInspectingA3X3Matrix()
         {
             // Arrange
             var m = new Matrix(-3, 5, 0, 1, -2, -7, 0, 1, 1);
@@ -37,7 +37,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void ConstructingAndInspectingA2x2Matrix()
+        public void ConstructingAndInspectingA2X2Matrix()
         {
             // Arrange
             var m = new Matrix(-3, 5, 1, -2);
@@ -123,7 +123,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CreatingA4x4IdentityMatrix()
+        public void CreatingA4X4IdentityMatrix()
         {
             // Arrange
             var expected = new Matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -136,7 +136,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CreatingA3x3IdentityMatrix()
+        public void CreatingA3X3IdentityMatrix()
         {
             // Arrange
             var expected = new Matrix(1, 0, 0, 0, 1, 0, 0, 0, 1);
@@ -149,7 +149,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CreatingA2x2IdentityMatrix()
+        public void CreatingA2X2IdentityMatrix()
         {
             // Arrange
             var expected = new Matrix(1, 0, 0, 1);
@@ -178,8 +178,10 @@ namespace RayTracer.Tests
         public void MultiplyingTheIdentityMatrixByATuple()
         {
             // Arrange
-            var a = new Point(1, 2, 3);
-            a.W = 4;
+            var a = new Point(1, 2, 3)
+            {
+                W = 4
+            };
 
             // Act
             var result = Matrix.Identity(4) * a;
@@ -216,11 +218,11 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CalculatingTheDeterminantOfA2x2Matrix()
+        public void CalculatingTheDeterminantOfA2X2Matrix()
         {
             // Arrange
             var a = new Matrix(1, 5, -3, 2);
-            var expected = 17;
+            const int expected = 17;
 
             // Act
             var result = a.Determinant();
@@ -230,7 +232,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void ASubmatrixOfA3x3MatrixIsA2x2Matrix()
+        public void ASubmatrixOfA3X3MatrixIsA2X2Matrix()
         {
             // Arrange
             var a = new Matrix(1, 5, 0, -3, 2, 7, 0, 6, -3);
@@ -244,7 +246,7 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void ASubmatrixOfA4x4MatrixIsA3x3Matrix()
+        public void ASubmatrixOfA4X4MatrixIsA3X3Matrix()
         {
             // Arrange
             var a = new Matrix(-6, 1, 1, 6, -8, 5, 8, 6, -1, 0, 8, 2, -7, 1, -1, 1);
@@ -258,11 +260,11 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CalculateTheMinorOfA3x3Matrix()
+        public void CalculateTheMinorOfA3X3Matrix()
         {
             // Arrange
             var a = new Matrix(3, 5, 0, 2, -1, -7, 6, -1, 5);
-            var expected = 25;
+            const int expected = 25;
 
             // Act
             var result = a.Minor(1, 0);
@@ -272,14 +274,14 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CalculateTheCofactorOfA3x3Matrix()
+        public void CalculateTheCofactorOfA3X3Matrix()
         {
             // Arrange
             var a = new Matrix(3, 5, 0, 2, -1, -7, 6, -1, 5);
-            var minor1 = -12;
-            var cofactor1 = -12;
-            var minor2 = 25;
-            var cofactor2 = -25;
+            const int minor1 = -12;
+            const int cofactor1 = -12;
+            const int minor2 = 25;
+            const int cofactor2 = -25;
 
             // Act
             var result1 = a.Minor(0, 0);
@@ -295,14 +297,14 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CalculateTheDeterminantOfA3x3Matrix()
+        public void CalculateTheDeterminantOfA3X3Matrix()
         {
             // Arrange
             var a = new Matrix(1, 2, 6, -5, 8, -4, 2, 6, 4);
-            var cofactor1 = 56;
-            var cofactor2 = 12;
-            var cofactor3 = -46;
-            var determinant = -196;
+            const int cofactor1 = 56;
+            const int cofactor2 = 12;
+            const int cofactor3 = -46;
+            const int determinant = -196;
 
             // Act
             var result1 = a.Cofactor(0, 0);
@@ -318,15 +320,15 @@ namespace RayTracer.Tests
         }
 
         [Fact]
-        public void CalculateTheDeterminantOfA4x4Matrix()
+        public void CalculateTheDeterminantOfA4X4Matrix()
         {
             // Arrange
             var a = new Matrix(-2, -8, 3, 5, -3, 1, 7, 3, 1, 2, -9, 6, -6, 7, 7, -9);
-            var cofactor1 = 690;
-            var cofactor2 = 447;
-            var cofactor3 = 210;
-            var cofactor4 = 51;
-            var determinant = -4071;
+            const int cofactor1 = 690;
+            const int cofactor2 = 447;
+            const int cofactor3 = 210;
+            const int cofactor4 = 51;
+            const int determinant = -4071;
 
             // Act
             var result1 = a.Cofactor(0, 0);
@@ -348,7 +350,7 @@ namespace RayTracer.Tests
         {
             // Arrange
             var a = new Matrix(6, 4, 4, 4, 5, 5, 7, 6, 4, -9, 3, -7, 9, 1, 7, -6);
-            var expDet = -2120;
+            const int expDet = -2120;
 
             // Act
             var resDet = a.Determinant();
@@ -364,7 +366,7 @@ namespace RayTracer.Tests
         {
             // Arrange
             var a = new Matrix(-4, 2, -2, -3, 9, 6, 2, 6, 0, -5, 1, -5, 0, 0, 0, 0);
-            var expDet = 0;
+            const int expDet = 0;
 
             // Act
             var resDet = a.Determinant();
@@ -380,11 +382,11 @@ namespace RayTracer.Tests
         {
             // Arrange
             var a = new Matrix(-5, 2, 6, -8, 1, -5, 1, 8, 7, 7, -6, -7, 1, -3, 7, 4);
-            var expected1 = 532;
-            var expected2 = -160;
-            var expected3 = -160.0 / 532.0;
-            var expected4 = 105;
-            var expected5 = 105.0 / 532.0;
+            const int expected1 = 532;
+            const int expected2 = -160;
+            const double expected3 = -160.0 / 532.0;
+            const int expected4 = 105;
+            const double expected5 = 105.0 / 532.0;
             var expected6 = new Matrix(0.21805, 0.45113, 0.24060, -0.04511, -0.80827, -1.45677, -0.44361, 0.52068, -0.07895, -0.22368, -0.05263, 0.19737, -0.52256, -0.81391, -0.30075, 0.30639);
 
             // Act

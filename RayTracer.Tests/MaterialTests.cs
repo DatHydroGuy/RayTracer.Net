@@ -119,7 +119,7 @@ namespace RayTracer.Tests
             var eyeVector = new Vector(0, 0, -1);
             var normalVector = new Vector(0, 0, -1);
             var light = Light.PointLight(new Point(0, 0, -10), new Colour(1, 1, 1));
-            bool isInShadow = true;
+            const bool isInShadow = true;
 
             // Act
             var result = m.Lighting(new Sphere(), light, targetPoint, eyeVector, normalVector, isInShadow);
@@ -132,11 +132,13 @@ namespace RayTracer.Tests
         public void LightingWithAStripedPatternApplied()
         {
             // Arrange
-            var m = new Material();
-            m.Pattern = new StripePattern(Colour.WHITE, Colour.BLACK);
-            m.Ambient = 1;
-            m.Diffuse = 0;
-            m.Specular = 0;
+            var m = new Material
+            {
+                Pattern = new StripePattern(Colour.WHITE, Colour.BLACK),
+                Ambient = 1,
+                Diffuse = 0,
+                Specular = 0
+            };
             var eyeVector = new Vector(0, 0, -1);
             var normalVector = new Vector(0, 0, -1);
             var light = Light.PointLight(new Point(0, 0, -10), new Colour(1, 1, 1));
@@ -215,8 +217,10 @@ namespace RayTracer.Tests
             var colourA = new Colour(0.1, 0.3, 0.5);
             var colourB = new Colour(0.2, 0.4, 0.6);
             var pattern = new TestPattern(colourA, colourB);
-            var orig = new Material();
-            orig.Pattern = pattern;
+            var orig = new Material
+            {
+                Pattern = pattern
+            };
 
             // Act
             var result = orig.Clone();
