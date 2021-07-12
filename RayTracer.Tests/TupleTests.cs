@@ -234,7 +234,7 @@ namespace RayTracer.Tests
         {
             // Arrange
             var v = new Vector(vx, vy, vz);
-            double expected = Math.Sqrt(expectedSquared);
+            var expected = Math.Sqrt(expectedSquared);
 
             // Act
             var result = v.Magnitude();
@@ -262,7 +262,7 @@ namespace RayTracer.Tests
         {
             // Arrange
             var v = new Vector(1, 2, 3);
-            double sqrt14 = Math.Sqrt(14);
+            var sqrt14 = Math.Sqrt(14);
             var expected = new Vector(1 / sqrt14, 2 / sqrt14, 3 / sqrt14);
 
             // Act
@@ -277,7 +277,7 @@ namespace RayTracer.Tests
         {
             // Arrange
             var v = new Vector(1, 2, 3);
-            var expected = 1;
+            const int expected = 1;
 
             // Act
             var result = v.Normalise().Magnitude();
@@ -292,7 +292,7 @@ namespace RayTracer.Tests
             // Arrange
             var v1 = new Vector(1, 2, 3);
             var v2 = new Vector(2, 3, 4);
-            var expected = 20;
+            const int expected = 20;
 
             // Act
             var result = v1.Dot(v2);

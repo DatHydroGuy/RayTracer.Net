@@ -6,17 +6,12 @@ namespace RayTracer.Tests
 {
     public class TestShape: Shape
     {
-        private Ray _savedRay;
-        public Ray SavedRay
-        {
-            get { return _savedRay; }
-            set { _savedRay = value; }
-        }
-        
+        public Ray SavedRay { get; private set; }
+
         public override Intersection[] LocalIntersects(Ray ray)
         {
             SavedRay = ray;
-            return new Intersection[] {new Intersection(double.NaN, null)};
+            return new Intersection[] {new(double.NaN, null)};
         }
 
         public override Vector LocalNormalAt(Point objectPoint, Intersection intersect = null)
@@ -105,8 +100,10 @@ namespace RayTracer.Tests
         {
             // Arrange
             var s = new TestShape();
-            var mat = new Material();
-            mat.Ambient = 1;
+            var mat = new Material
+            {
+                Ambient = 1
+            };
 
             // Act
             s.Material = mat;
@@ -156,8 +153,10 @@ namespace RayTracer.Tests
         {
             // Arrange
             var oneOverSqrtTwo = 1.0 / Math.Sqrt(2);
-            var s = new TestShape();
-            s.Transform = Transformations.Translation(0, 1, 0);
+            var s = new TestShape
+            {
+                Transform = Transformations.Translation(0, 1, 0)
+            };
             var expected = new Vector(0, oneOverSqrtTwo, -oneOverSqrtTwo);
 
             // Act
@@ -188,13 +187,19 @@ namespace RayTracer.Tests
         public void ConvertingAPointFromWorldSpaceToObjectSpace()
         {
             // Arrange
-            var g1 = new Group();
-            g1.Transform = Transformations.RotationY(Math.PI / 2.0);
-            var g2 = new Group();
-            g2.Transform = Transformations.Scaling(2, 2, 2);
+            var g1 = new Group
+            {
+                Transform = Transformations.RotationY(Math.PI / 2.0)
+            };
+            var g2 = new Group
+            {
+                Transform = Transformations.Scaling(2, 2, 2)
+            };
             g1.AddChild(g2);
-            var s = new Sphere();
-            s.Transform = Transformations.Translation(5, 0, 0);
+            var s = new Sphere
+            {
+                Transform = Transformations.Translation(5, 0, 0)
+            };
             g2.AddChild(s);
             var expected = new Point(0, 0, -1);
 
@@ -210,13 +215,19 @@ namespace RayTracer.Tests
         {
             // Arrange
             var thirdSqrt3 = Math.Sqrt(3) / 3.0;
-            var g1 = new Group();
-            g1.Transform = Transformations.RotationY(Math.PI / 2.0);
-            var g2 = new Group();
-            g2.Transform = Transformations.Scaling(1, 2, 3);
+            var g1 = new Group
+            {
+                Transform = Transformations.RotationY(Math.PI / 2.0)
+            };
+            var g2 = new Group
+            {
+                Transform = Transformations.Scaling(1, 2, 3)
+            };
             g1.AddChild(g2);
-            var s = new Sphere();
-            s.Transform = Transformations.Translation(5, 0, 0);
+            var s = new Sphere
+            {
+                Transform = Transformations.Translation(5, 0, 0)
+            };
             g2.AddChild(s);
             var expected = new Vector(0.28571, 0.42857, -0.85714);
 
@@ -231,13 +242,19 @@ namespace RayTracer.Tests
         public void FindingTheNormalOnAChildObjectInWorldSpace()
         {
             // Arrange
-            var g1 = new Group();
-            g1.Transform = Transformations.RotationY(Math.PI / 2.0);
-            var g2 = new Group();
-            g2.Transform = Transformations.Scaling(1, 2, 3);
+            var g1 = new Group
+            {
+                Transform = Transformations.RotationY(Math.PI / 2.0)
+            };
+            var g2 = new Group
+            {
+                Transform = Transformations.Scaling(1, 2, 3)
+            };
             g1.AddChild(g2);
-            var s = new Sphere();
-            s.Transform = Transformations.Translation(5, 0, 0);
+            var s = new Sphere
+            {
+                Transform = Transformations.Translation(5, 0, 0)
+            };
             g2.AddChild(s);
             var expected = new Vector(0.2857, 0.42854, -0.85716);
 
@@ -266,8 +283,10 @@ namespace RayTracer.Tests
         public void QueryingAShapesBoundingBoxInItsParentsSpace()
         {
             // Arrange
-            var s = new Sphere();
-            s.Transform = Transformations.Translation(1, -3, 5) * Transformations.Scaling(0.5, 2, 4);
+            var s = new Sphere
+            {
+                Transform = Transformations.Translation(1, -3, 5) * Transformations.Scaling(0.5, 2, 4)
+            };
 
             // Act
             var boundingBox = s.GetParentSpaceBoundingBox();
@@ -311,7 +330,7 @@ namespace RayTracer.Tests
         public void StringRepresentation()
         {
             // Arrange
-            var expected = "[Type:RayTracer.Tests.TestShape\nId:637602294772396341\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:null\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]";
+            const string expected = "[Type:RayTracer.Tests.TestShape\nId:637602294772396341\nOrigin:[X:0, Y:0, Z:0, W:1]\nParent:null\nMaterial:[Colour:[R:1, G:1, B:1]\nAmb:0.1,Dif:0.9,Spec:0.9,Shin:200,Refl:0,Tran:0,Refr:1,Shad:True,\nPattern:null\n]\nTransform:[[1, 0, 0, 0,\n0, 1, 0, 0,\n0, 0, 1, 0,\n0, 0, 0, 1]]\nSavedRay:false]";
             var orig = new TestShape();
 
             // Act

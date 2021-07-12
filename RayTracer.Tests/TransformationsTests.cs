@@ -418,11 +418,11 @@ namespace RayTracer.Tests
 
             // Assert
             var allEqual = true;
-            for (int y = 0; y < 4; y++)
+            for (var y = 0; y < 4; y++)
             {
-                for (int x = 0; x < 4; x++)
+                for (var x = 0; x < 4; x++)
                 {
-                    allEqual &= orig.Data[y, x] == result.Data[y, x];
+                    allEqual &= Utilities.AlmostEqual(orig.Data[y, x], result.Data[y, x]);
                 }
             }
             Assert.True(allEqual);

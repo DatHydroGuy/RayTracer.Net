@@ -4,7 +4,7 @@ using Xunit;
 
 namespace RayTracer.Tests
 {
-    class TestPattern: Pattern
+    internal class TestPattern: Pattern
     {
         public TestPattern(Colour colourA, Colour colourB): base(colourA, colourB)
         {}
@@ -52,8 +52,10 @@ namespace RayTracer.Tests
         public void StripesWithAnObjectTransformation()
         {
             // Arrange
-            var obj = new Sphere();
-            obj.Transform = Transformations.Scaling(2, 2, 2);
+            var obj = new Sphere
+            {
+                Transform = Transformations.Scaling(2, 2, 2)
+            };
             var pattern = new TestPattern(Colour.WHITE, Colour.BLACK);
             var expected = new Colour(1, 1.5, 2);
 
@@ -69,8 +71,10 @@ namespace RayTracer.Tests
         {
             // Arrange
             var obj = new Sphere();
-            var pattern = new TestPattern(Colour.WHITE, Colour.BLACK);
-            pattern.Transform = Transformations.Scaling(2, 2, 2);
+            var pattern = new TestPattern(Colour.WHITE, Colour.BLACK)
+            {
+                Transform = Transformations.Scaling(2, 2, 2)
+            };
             var expected = new Colour(1, 1.5, 2);
 
             // Act
@@ -84,10 +88,14 @@ namespace RayTracer.Tests
         public void StripesWithAnObjectAndAPatternTransformation()
         {
             // Arrange
-            var obj = new Sphere();
-            obj.Transform = Transformations.Scaling(2, 2, 2);
-            var pattern = new TestPattern(Colour.WHITE, Colour.BLACK);
-            pattern.Transform = Transformations.Translation(0.5, 1, 1.5);
+            var obj = new Sphere
+            {
+                Transform = Transformations.Scaling(2, 2, 2)
+            };
+            var pattern = new TestPattern(Colour.WHITE, Colour.BLACK)
+            {
+                Transform = Transformations.Translation(0.5, 1, 1.5)
+            };
             var expected = new Colour(0.75, 0.5, 0.25);
 
             // Act

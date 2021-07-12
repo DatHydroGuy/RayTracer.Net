@@ -15,9 +15,9 @@ namespace RayTracer.Tests
             return s1WithoutId == s2WithoutId;
         }
 
-        public static string CutOutStrings(string s, string stringToCut)
+        private static string CutOutStrings(string s, string stringToCut)
         {
-            var sOld = "";
+            string sOld;
             var sNew = s;
             do
             {
@@ -28,15 +28,15 @@ namespace RayTracer.Tests
             return sNew;
         }
 
-        public static string CutOutString(string s, string stringToCut)
+        private static string CutOutString(string s, string stringToCut)
         {
-            var idStart = s.IndexOf(stringToCut);
+            var idStart = s.IndexOf(stringToCut, StringComparison.Ordinal);
             if (idStart < 0)
                 return s;
 
-            var idEnd = s.IndexOf("\n", idStart + 2);
+            var idEnd = s.IndexOf("\n", idStart + 2, StringComparison.Ordinal);
 
-            return s.Substring(0, idStart) + s.Substring(idEnd);
+            return s[..idStart] + s[idEnd..];
         }
 
         /*
@@ -46,9 +46,9 @@ namespace RayTracer.Tests
         {
             var roots = new double[3][] {new double[2] {0, 0}, new double[2] {0, 0}, new double[2] {0, 0}};
 
-            var f = ((3 * c / a) - (b * b / (a * a))) / 3.0;
-            var g = ((2 * (b * b * b) / (a * a * a)) - (9 * b * c / (a * a)) + (27 * d / a)) / 27.0;
-            var h = ((g * g) / 4.0) + ((f * f * f) / 27.0);
+            var f = (3 * c / a - b * b / (a * a)) / 3.0;
+            var g = (2 * (b * b * b) / (a * a * a) - 9 * b * c / (a * a) + 27 * d / a) / 27.0;
+            var h = g * g / 4.0 + f * f * f / 27.0;
             
             if (h <= 0)
             {
@@ -62,7 +62,7 @@ namespace RayTracer.Tests
                 else
                 {
                     // There are 3 real roots
-                    var i = Math.Sqrt((g * g / 4.0) - h);
+                    var i = Math.Sqrt(g * g / 4.0 - h);
                     var j = Math.Cbrt(i);
                     var k = Math.Acos(-g / (2 * i));
                     var bigL = -j;
@@ -97,16 +97,16 @@ namespace RayTracer.Tests
         */
         public static double[] SolveQuartic(double a, double b, double c, double d, double e)
         {
-            var roots = new double[4][] {new double[2] {0, 0}, new double[2] {0, 0}, new double[2] {0, 0}, new double[2] {0, 0}};
+            var roots = new[] {new double[] {0, 0}, new double[] {0, 0}, new double[] {0, 0}, new double[] {0, 0}};
 
-            var f = c - (b * b * 3.0 / 8.0);
+            var f = c - b * b * 3.0 / 8.0;
             var g = d + b * b * b / 8.0 - b * c / 2.0;
             var h = e - b * b * b * b * 3.0 / 256.0 + b * b * c / 16.0 - b * d / 4.0;
 
-            var reducedCubicEquation = new double[4] {1, f / 2.0, (f * f - 4.0 * h) / 16.0, -g * g / 64.0};
+            var reducedCubicEquation = new[] {1, f / 2.0, (f * f - 4.0 * h) / 16.0, -g * g / 64.0};
             var rootsReducedCubic = SolveCubic(reducedCubicEquation[0], reducedCubicEquation[1], reducedCubicEquation[2], reducedCubicEquation[3]);
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 rootsReducedCubic[i][0] = Math.Round(rootsReducedCubic[i][0], 6, MidpointRounding.AwayFromZero);
                 rootsReducedCubic[i][1] = Math.Round(rootsReducedCubic[i][1], 6, MidpointRounding.AwayFromZero);
@@ -125,22 +125,22 @@ namespace RayTracer.Tests
                     var s = b / (4 * a);
 
                     var valueRealX1 = p + q + r - s;
-                    var valueImaginaryX1 = 0;
+                    const int valueImaginaryX1 = 0;
                     roots[0][0] = valueRealX1;
                     roots[0][1] = valueImaginaryX1;
 
                     var valueRealX2 = p - q - r - s;
-                    var valueImaginaryX2 = 0;
+                    const int valueImaginaryX2 = 0;
                     roots[1][0] = valueRealX2;
                     roots[1][1] = valueImaginaryX2;
 
                     var valueRealX3 = -p + q - r - s;
-                    var valueImaginaryX3 = 0;
+                    const int valueImaginaryX3 = 0;
                     roots[2][0] = valueRealX3;
                     roots[2][1] = valueImaginaryX3;
 
                     var valueRealX4 = -p - q + r - s;
-                    var valueImaginaryX4 = 0;
+                    const int valueImaginaryX4 = 0;
                     roots[3][0] = valueRealX4;
                     roots[3][1] = valueImaginaryX4;
                 }
@@ -150,23 +150,21 @@ namespace RayTracer.Tests
                     var index = 0;
                     foreach (var x in rootsReducedCubic)
                     {
-                        if (x[0] < 0)
-                        {
-                            rootsReducedCubicSorted[index] = x;
-                            index += 1;
-                        }
+                        if (!(x[0] < 0))
+                            continue;
+                        rootsReducedCubicSorted[index] = x;
+                        index += 1;
                     }
                     foreach (var x in rootsReducedCubic)
                     {
-                        if (x[0] > 0)
-                        {
-                            rootsReducedCubicSorted[index] = x;
-                            index += 1;
-                        }
+                        if (!(x[0] > 0))
+                            continue;
+                        rootsReducedCubicSorted[index] = x;
+                        index += 1;
                     }
 
-                    var p = new double[] {0, Math.Sqrt(Math.Abs(rootsReducedCubicSorted[0][0]))};
-                    var q = new double[] {0, Math.Sqrt(Math.Abs(rootsReducedCubicSorted[1][0]))};
+                    var p = new[] {0, Math.Sqrt(Math.Abs(rootsReducedCubicSorted[0][0]))};
+                    var q = new[] {0, Math.Sqrt(Math.Abs(rootsReducedCubicSorted[1][0]))};
                     var pq = -1.0 * p[1] * q[1];
                     var r = -g / (8 * pq);
                     var s = b / (4 * a);
@@ -196,17 +194,12 @@ namespace RayTracer.Tests
             {
                 // Imaginary part exists in reduced cubic equation
                 // We don't want any imaginary solutions for our ray tracer, so return empty entries
-                return new double[] {};
+                return Array.Empty<double>();
             }
             
             var rootsList = new List<double[]>(roots);
             var nonImaginaryRoots = rootsList.Where(x => x[1] == 0).ToArray();
-            var results = new List<double>();
-            for (int i = 0; i < nonImaginaryRoots.Length; i++)
-            {
-                results.Add(nonImaginaryRoots[i][0]);
-            }
-            return results.ToArray();
+            return nonImaginaryRoots.Select(t => t[0]).ToArray();
         }
 
         /*
@@ -222,17 +215,15 @@ namespace RayTracer.Tests
 
             if(Utilities.AlmostEqual(D, 0))
             {
-                return new double[] {-p, -p};
+                return new[] {-p, -p};
             }
-            else if (D < 0)
+
+            if (D < 0)
             {
-                return new double[] {};
+                return Array.Empty<double>();
             }
-            else
-            {
-                var sqrtD = Math.Sqrt(D);
-                return new double[] {-sqrtD - p, sqrtD - p};
-            }
+            var sqrtD = Math.Sqrt(D);
+            return new[] {-sqrtD - p, sqrtD - p};
         }
 
         /*
@@ -291,14 +282,7 @@ namespace RayTracer.Tests
             // Resubstitute values back in
             var sub = 1.0 / 3.0 * A;
 
-            var results = new List<double>();
-
-            foreach (var item in s)
-            {
-                results.Add(item - sub);
-            }
-
-            return results.ToArray();
+            return s.Select(item => item - sub).ToArray();
         }
 
         /*
@@ -348,7 +332,7 @@ namespace RayTracer.Tests
                 else
                 {
                     // No roots
-                    return new double[] {};
+                    return Array.Empty<double>();
                 }
 
                 if (Utilities.AlmostEqual(v, 0))
@@ -362,7 +346,7 @@ namespace RayTracer.Tests
                 else
                 {
                     // No roots
-                    return new double[] {};
+                    return Array.Empty<double>();
                 }
 
                 // Solve first quadratic equation
@@ -375,12 +359,7 @@ namespace RayTracer.Tests
             // Resubstitute values back in
             var sub = 1.0 / 4.0 * A;
 
-            var results = new List<double>();
-
-            foreach (var item in s)
-            {
-                results.Add(item - sub);
-            }
+            var results = s.Select(item => item - sub).ToList();
 
             results.Sort();
             return results.ToArray();

@@ -24,12 +24,19 @@ namespace RayTracer.Tests
         {
             // Arrange
             var light = Light.PointLight(new Point(-10, 10, -10), new Colour(1, 1, 1));
-            var s1 = new Sphere();
-            s1.Material.Colour = new Colour(0.8, 1, 0.6);
-            s1.Material.Diffuse = 0.7;
-            s1.Material.Specular = 0.2;
-            var s2= new Sphere();
-            s2.Transform = Transformations.Scaling(0.5, 0.5, 0.5);
+            var s1 = new Sphere
+            {
+                Material =
+                {
+                    Colour = new Colour(0.8, 1, 0.6),
+                    Diffuse = 0.7,
+                    Specular = 0.2
+                }
+            };
+            var s2= new Sphere
+            {
+                Transform = Transformations.Scaling(0.5, 0.5, 0.5)
+            };
 
             // Act
             var w = World.DefaultWorld();
@@ -199,12 +206,16 @@ namespace RayTracer.Tests
         public void CorrectlyColouringAPointInShadow()
         {
             // Arrange
-            var w = new World();
-            w.Lights = new Light[] {Light.PointLight(new Point(0, 0, -10), new Colour(1, 1, 1))};
+            var w = new World
+            {
+                Lights = new Light[] {Light.PointLight(new Point(0, 0, -10), new Colour(1, 1, 1))}
+            };
             var s1 = new Sphere();
-            var s2 = new Sphere();
-            s2.Transform = Transformations.Translation(0, 0, 10);
-            w.Objects = new Sphere[] {s1, s2};
+            var s2 = new Sphere
+            {
+                Transform = Transformations.Translation(0, 0, 10)
+            };
+            w.Objects = new Shape[] {s1, s2};
             var ray = new Ray(new Point(0, 0, 5), new Vector(0, 0, 1));
             var i = new Intersection(4, s2);
             var expected = new Colour(0.1, 0.1, 0.1);
@@ -242,9 +253,14 @@ namespace RayTracer.Tests
             // Arrange
             var halfSqrt2 = Math.Sqrt(2) / 2.0;
             var w = World.DefaultWorld();
-            var shape = new Plane();
-            shape.Transform = Transformations.Translation(0, -1, 0);
-            shape.Material.Reflective = 0.5;
+            var shape = new Plane
+            {
+                Transform = Transformations.Translation(0, -1, 0),
+                Material =
+                {
+                    Reflective = 0.5
+                }
+            };
             w.AddShapeToWorld(shape);
             var ray = new Ray(new Point(0, 0, -3), new Vector(0, -halfSqrt2, halfSqrt2));
             var i = new Intersection(Math.Sqrt(2), shape);
@@ -264,9 +280,14 @@ namespace RayTracer.Tests
             // Arrange
             var halfSqrt2 = Math.Sqrt(2) / 2.0;
             var w = World.DefaultWorld();
-            var shape = new Plane();
-            shape.Transform = Transformations.Translation(0, -1, 0);
-            shape.Material.Reflective = 0.5;
+            var shape = new Plane
+            {
+                Transform = Transformations.Translation(0, -1, 0),
+                Material =
+                {
+                    Reflective = 0.5
+                }
+            };
             w.AddShapeToWorld(shape);
             var ray = new Ray(new Point(0, 0, -3), new Vector(0, -halfSqrt2, halfSqrt2));
             var i = new Intersection(Math.Sqrt(2), shape);
@@ -286,13 +307,23 @@ namespace RayTracer.Tests
             // Arrange
             var w = new World();
             w.AddLightToWorld(Light.PointLight(new Point(0, 0, 0), Colour.WHITE));
-            var lower = new Plane();
-            lower.Transform = Transformations.Translation(0, -1, 0);
-            lower.Material.Reflective = 1;
+            var lower = new Plane
+            {
+                Transform = Transformations.Translation(0, -1, 0),
+                Material =
+                {
+                    Reflective = 1
+                }
+            };
             w.AddShapeToWorld(lower);
-            var upper = new Plane();
-            upper.Transform = Transformations.Translation(0, 1, 0);
-            upper.Material.Reflective = 1;
+            var upper = new Plane
+            {
+                Transform = Transformations.Translation(0, 1, 0),
+                Material =
+                {
+                    Reflective = 1
+                }
+            };
             w.AddShapeToWorld(upper);
             var ray = new Ray(new Point(0, 0, 0), new Vector(0, 1, 0));
 
@@ -309,9 +340,14 @@ namespace RayTracer.Tests
             // Arrange
             var halfSqrt2 = Math.Sqrt(2) / 2.0;
             var w = World.DefaultWorld();
-            var shape = new Plane();
-            shape.Transform = Transformations.Translation(0, -1, 0);
-            shape.Material.Reflective = 0.5;
+            var shape = new Plane
+            {
+                Transform = Transformations.Translation(0, -1, 0),
+                Material =
+                {
+                    Reflective = 0.5
+                }
+            };
             w.AddShapeToWorld(shape);
             var ray = new Ray(new Point(0, 0, -3), new Vector(0, -halfSqrt2, halfSqrt2));
             var i = new Intersection(Math.Sqrt(2), shape);
@@ -410,15 +446,25 @@ namespace RayTracer.Tests
             // Arrange
             var halfSqrt2 = Math.Sqrt(2) / 2.0;
             var w = World.DefaultWorld();
-            var floor = new Plane();
-            floor.Transform = Transformations.Translation(0, -1, 0);
-            floor.Material.Transparency = 0.5;
-            floor.Material.RefractiveIndex = 1.5;
+            var floor = new Plane
+            {
+                Transform = Transformations.Translation(0, -1, 0),
+                Material =
+                {
+                    Transparency = 0.5,
+                    RefractiveIndex = 1.5
+                }
+            };
             w.AddShapeToWorld(floor);
-            var ball = new Sphere();
-            ball.Transform = Transformations.Translation(0, -3.5, -0.5);
-            ball.Material.Colour = new Colour(1, 0, 0);
-            ball.Material.Ambient = 0.5;
+            var ball = new Sphere
+            {
+                Transform = Transformations.Translation(0, -3.5, -0.5),
+                Material =
+                {
+                    Colour = new Colour(1, 0, 0),
+                    Ambient = 0.5
+                }
+            };
             w.AddShapeToWorld(ball);
             var r = new Ray(new Point(0, 0, -3), new Vector(0, -halfSqrt2, halfSqrt2));
             var xs = Intersection.Intersections(new Intersection(Math.Sqrt(2), floor));
@@ -438,16 +484,26 @@ namespace RayTracer.Tests
             // Arrange
             var halfSqrt2 = Math.Sqrt(2) / 2.0;
             var w = World.DefaultWorld();
-            var floor = new Plane();
-            floor.Transform = Transformations.Translation(0, -1, 0);
-            floor.Material.Reflective = 0.5;
-            floor.Material.Transparency = 0.5;
-            floor.Material.RefractiveIndex = 1.5;
+            var floor = new Plane
+            {
+                Transform = Transformations.Translation(0, -1, 0),
+                Material =
+                {
+                    Reflective = 0.5,
+                    Transparency = 0.5,
+                    RefractiveIndex = 1.5
+                }
+            };
             w.AddShapeToWorld(floor);
-            var ball = new Sphere();
-            ball.Transform = Transformations.Translation(0, -3.5, -0.5);
-            ball.Material.Colour = new Colour(1, 0, 0);
-            ball.Material.Ambient = 0.5;
+            var ball = new Sphere
+            {
+                Transform = Transformations.Translation(0, -3.5, -0.5),
+                Material =
+                {
+                    Colour = new Colour(1, 0, 0),
+                    Ambient = 0.5
+                }
+            };
             w.AddShapeToWorld(ball);
             var r = new Ray(new Point(0, 0, -3), new Vector(0, -halfSqrt2, halfSqrt2));
             var xs = Intersection.Intersections(new Intersection(Math.Sqrt(2), floor));
