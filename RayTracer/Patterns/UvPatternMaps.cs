@@ -9,6 +9,16 @@ namespace RayTracer
         Planar,
         Cubic
     }
+
+    public enum CubeFace
+    {
+        Left,
+        Right,
+        Front,
+        Back,
+        Lower,
+        Upper
+    }
     
     public static class UvPatternMaps
     {
@@ -56,6 +66,66 @@ namespace RayTracer
         public static (double, double) UvCubicMapping(Point point)
         {
             throw new NotImplementedException();
+        }
+
+        public static CubeFace FaceFromPoint(Point point)
+        {
+            var absX = Math.Abs(point.X);
+            var absY = Math.Abs(point.Y);
+            var absZ = Math.Abs(point.Z);
+            var coord = Math.Max(absX, Math.Max(absY, absZ));
+
+            if (Utilities.AlmostEqual(coord, point.X))
+                return CubeFace.Right;
+            if (Utilities.AlmostEqual(coord, -point.X))
+                return CubeFace.Left;
+            if (Utilities.AlmostEqual(coord, point.Y))
+                return CubeFace.Upper;
+            if (Utilities.AlmostEqual(coord, -point.Y))
+                return CubeFace.Lower;
+            return Utilities.AlmostEqual(coord, point.Z) ? CubeFace.Front : CubeFace.Back;
+        }
+
+        public static (double, double) UvMapCubeFront(Point point)
+        {
+            var u = (point.X + 1) % 2 * 0.5;
+            var v = (point.Y + 1) % 2 * 0.5;
+            return (u, v);
+        }
+
+        public static (double, double) UvMapCubeBack(Point point)
+        {
+            var u = (1 - point.X) % 2 * 0.5;
+            var v = (point.Y + 1) % 2 * 0.5;
+            return (u, v);
+        }
+
+        public static (double, double) UvMapCubeLeft(Point point)
+        {
+            var u = (point.Z + 1) % 2 * 0.5;
+            var v = (point.Y + 1) % 2 * 0.5;
+            return (u, v);
+        }
+
+        public static (double, double) UvMapCubeRight(Point point)
+        {
+            var u = (1 - point.Z) % 2 * 0.5;
+            var v = (point.Y + 1) % 2 * 0.5;
+            return (u, v);
+        }
+
+        public static (double, double) UvMapCubeUpper(Point point)
+        {
+            var u = (point.X + 1) % 2 * 0.5;
+            var v = (1 - point.Z) % 2 * 0.5;
+            return (u, v);
+        }
+
+        public static (double, double) UvMapCubeLower(Point point)
+        {
+            var u = (point.X + 1) % 2 * 0.5;
+            var v = (point.Z + 1) % 2 * 0.5;
+            return (u, v);
         }
     }
 }
