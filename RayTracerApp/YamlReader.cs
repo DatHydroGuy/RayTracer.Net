@@ -549,22 +549,99 @@ namespace RayTracerApp
                 }
                 else if (instruction.Contains("colours") || instruction.Contains("colors"))
                 {
-                    var colours = patternInstructions[instruction] as List<object>;
-                    if (colours == null)
+                    var colList = ProcessPatternColours(patternInstructions, instruction);
+                    pattern.ColourA = colList[0];
+                    pattern.ColourB = colList[1];
+                }
+                else if (instruction.Contains("mapping"))
+                {
+                    if (pattern is UvPattern uv)
                     {
-                        throw new System.Exception("Invalid colour data format");
+                        uv.UvPatternMapType = patternInstructions[instruction] switch
+                        {
+                            "spherical" => UvPatternMapType.Spherical,
+                            "cylindrical" => UvPatternMapType.Cylindrical,
+                            "planar" => UvPatternMapType.Planar,
+                            "cubic" => UvPatternMapType.Cubic,
+                            _ => throw new System.Exception($"Unknown UV Mapping Type: {patternInstructions[instruction]}")
+                        };
                     }
-                    
-                    var colourLevels = ExtractTuple(colours[0], "Light intensity");
-                    if (pattern == null)
-                        continue;
-                    pattern.ColourA = new Colour(colourLevels[0], colourLevels[1], colourLevels[2]);
-                    colourLevels = ExtractTuple(colours[1], "Light intensity");
-                    pattern.ColourB = new Colour(colourLevels[0], colourLevels[1], colourLevels[2]);
+                }
+                else if (instruction.Contains("uv-pattern"))
+                {
+                    if (patternInstructions[instruction] is Dictionary<object, object> uvPatternData)
+                        pattern = ProcessUvPatternData(((UvPattern)pattern).UvPatternMapType, uvPatternData);
+                    else
+                        throw new System.Exception($"Unknown type(s) in UV pattern data {patternInstructions[instruction]}");
                 }
             }
 
             return pattern;
+        }
+
+        private static List<Colour> ProcessPatternColours(Dictionary<object, object> patternInstructions, string instruction)
+        {
+            if (patternInstructions[instruction] is not List<object> colours)
+            {
+                throw new System.Exception("Invalid colour data format");
+            }
+
+            var colourList = new List<Colour>();
+
+            foreach (var colour in colours)
+            {
+                var colourLevels = ExtractTuple(colour, "Pattern colour");
+                colourList.Add(new Colour(colourLevels[0], colourLevels[1], colourLevels[2]));
+            }
+
+            return colourList;
+        }
+
+        private Pattern ProcessUvPatternData(UvPatternMapType uvPatternMapType, Dictionary<object,object> uvPatternData)
+        {
+            UvPattern uvPattern = null;
+            foreach (var key in uvPatternData.Keys)
+            {
+                var instruction = key.ToString() ?? "";
+                if (instruction.Contains("type"))
+                {
+                    uvPattern = GetEmptyUvPattern(uvPatternData[instruction].ToString());
+                }
+                else if (instruction.Contains("colours") || instruction.Contains("colors"))
+                {
+                    var colList = ProcessPatternColours(uvPatternData, instruction);
+                    if (uvPattern is null)
+                        continue;
+                    uvPattern.ColourA = colList[0];
+                    uvPattern.ColourB = colList[1];
+                }
+                else if (instruction.Contains("width"))
+                {
+                    if (uvPattern is null)
+                        continue;
+                    uvPattern.Width = ExtractInteger(uvPatternData[instruction].ToString(), "UV pattern width");
+                }
+                else if (instruction.Contains("height"))
+                {
+                    if (uvPattern is null)
+                        continue;
+                    uvPattern.Height = ExtractInteger(uvPatternData[instruction].ToString(), "UV pattern height");
+                }
+            }
+
+            if (uvPattern is not null)
+                uvPattern.UvPatternMapType = uvPatternMapType;
+
+            return uvPattern;
+        }
+
+        private static UvPattern GetEmptyUvPattern(string patternType)
+        {
+            return patternType switch
+            {
+                "checker" => new UvCheckerPattern(1, 1, Colour.BLACK, Colour.WHITE),
+                _ => throw new System.Exception($"Unknown Pattern type {patternType}")
+            };
         }
 
         private static Pattern GetEmptyPattern(string patternType)
@@ -581,6 +658,7 @@ namespace RayTracerApp
                 "perturbed" => new PerturbedPattern(null),
                 "ring" => new RingPattern(Colour.BLACK, Colour.WHITE),
                 "stripe" => new StripePattern(Colour.BLACK, Colour.WHITE),
+                "map" => new UvPattern(Colour.BLACK, Colour.WHITE),
                 _ => throw new System.Exception($"Unknown Pattern type {patternType}")
             };
         }
