@@ -583,7 +583,10 @@ namespace RayTracerApp
         {
             if (patternInstructions[instruction] is not List<object> colours)
             {
-                throw new System.Exception("Invalid colour data format");
+                if (patternInstructions[instruction] is Dictionary<object, object> colourDict)
+                    colours = colourDict.Values.ToList();
+                else
+                    throw new System.Exception("Invalid colour data format");
             }
 
             var colourList = new List<Colour>();
@@ -612,8 +615,19 @@ namespace RayTracerApp
                     var colList = ProcessPatternColours(uvPatternData, instruction);
                     if (uvPattern is null)
                         continue;
-                    uvPattern.ColourA = colList[0];
-                    uvPattern.ColourB = colList[1];
+                    if (colList.Count == 5)
+                    {
+                        ((AlignCheckPattern)uvPattern).MainColour = colList[0];
+                        ((AlignCheckPattern)uvPattern).UpperLeftColour = colList[1];
+                        ((AlignCheckPattern)uvPattern).UpperRightColour = colList[2];
+                        ((AlignCheckPattern)uvPattern).LowerLeftColour = colList[3];
+                        ((AlignCheckPattern)uvPattern).LowerRightColour = colList[4];
+                    }
+                    else
+                    {
+                        uvPattern.ColourA = colList[0];
+                        uvPattern.ColourB = colList[1];
+                    }
                 }
                 else if (instruction.Contains("width"))
                 {
@@ -640,6 +654,7 @@ namespace RayTracerApp
             return patternType switch
             {
                 "checker" => new UvCheckerPattern(1, 1, Colour.BLACK, Colour.WHITE),
+                "align-check" => new AlignCheckPattern(Colour.BLACK, Colour.WHITE, Colour.WHITE, Colour.WHITE, Colour.WHITE),
                 _ => throw new System.Exception($"Unknown Pattern type {patternType}")
             };
         }

@@ -1,5 +1,3 @@
-using System;
-
 namespace RayTracer
 {
     public class BlendedPattern : Pattern
