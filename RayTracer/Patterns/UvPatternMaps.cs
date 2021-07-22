@@ -45,7 +45,12 @@ namespace RayTracer
 
         public static (double, double) UvCylindricalMapping(Point point)
         {
-            throw new NotImplementedException();
+            var theta = Math.Atan2(point.X, point.Z);
+            var rawU = theta / (2 * Math.PI);
+            var u = 1 - (rawU + 0.5);
+
+            var v = point.Y % 1;
+            return (u, v < 0 ? v + 1 : v);
         }
 
         public static (double, double) UvCubicMapping(Point point)
