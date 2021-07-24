@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using YamlDotNet.Serialization;
@@ -18,7 +19,7 @@ namespace RayTracerApp
         public YamlReader(string yamlFile)
         {
             if (!System.IO.File.Exists(yamlFile))
-                System.Console.WriteLine($"YAML file {yamlFile} not found.");
+                Console.WriteLine($"YAML file {yamlFile} not found.");
             
             CreateHelperFolders();
 
@@ -72,7 +73,7 @@ namespace RayTracerApp
                         outFile = item.Values.First().ToString();
                         outFile = outFile?.Split(System.IO.Path.DirectorySeparatorChar).Last();
                         outFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(_imagesFolder, outFile ?? "default.ppm"));
-                        System.Console.WriteLine($"Writing to file: {outFile}");
+                        Console.WriteLine($"Writing to file: {outFile}");
                         break;
                     }
                 }
@@ -82,12 +83,12 @@ namespace RayTracerApp
             var canvas = camera.Render(world, reflectionDepth: _renderingDetails["reflectiondepth"],
                                        antialiasLevel: _renderingDetails["antialiaslevel"], showProgress: _renderingDetails["showprogress"] != 0);
             canvas.WritePpmFile(outFile);
-            System.Console.WriteLine("Image rendering complete");
+            Console.WriteLine("Image rendering complete");
         }
 
         private void ProcessDefinitions(Dictionary<string, object> definitionData)
         {
-            System.Console.WriteLine($"Defining: {definitionData.Values.First()}");
+            Console.WriteLine($"Defining: {definitionData.Values.First()}");
             var materialValuesList = new Dictionary<object, object>();
             var transformValuesList = new List<object>();
             var name = "";
@@ -178,9 +179,9 @@ namespace RayTracerApp
                                         var objFile = fileValue.ToString();
                                         fileValue = objFile?.Split(System.IO.Path.DirectorySeparatorChar).Last();
                                         objFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(_objFolder, fileValue.ToString() ?? "default.ppm"));
-                                        System.Console.WriteLine($"Loading .obj file: {objFile}");
+                                        Console.WriteLine($"Loading .obj file: {objFile}");
                                         var parser = new ObjParser();
-                                        parser.ReadFile(objFile.ToString());
+                                        parser.ReadFile(objFile);
                                         var obj = parser.ObjToGroup();
                                         // Create a dummy shape(sphere) to hold the transform & material for the object
                                         var arguments = new List<KeyValuePair<string, object>> {new("add", "sphere")};
@@ -199,6 +200,22 @@ namespace RayTracerApp
                                         _groupDefinitions.Add(name, obj);
                                         break;
                                     }
+                                    case "add" when firstValue.ToString() != "group" && firstValue.ToString() != "csg" && firstValue.ToString() != "obj":
+                                    {
+                                        // Need to unpack tempObject and then pass it into ProcessShape()
+                                        var arguments = new List<KeyValuePair<string, object>> ();
+                                        foreach (var (tempKey, tempValue) in tempObject)
+                                        {
+                                            arguments.Add(new KeyValuePair<string, object>(tempKey.ToString(), tempValue));
+                                        }
+                                        var s = ProcessShape(arguments);
+                                        
+                                        // Package the shape into our pre-defined groups dictionary
+                                        var g = new Group();
+                                        g.AddChild(s);
+                                        _groupDefinitions.Add(name, g);
+                                        break;
+                                    }
                                     default:
                                     {
                                         foreach (var (materialDefKey, materialDefValue) in tempObject.Where(kvp => !materialValuesList.TryAdd(kvp.Key, kvp.Value)))
@@ -214,30 +231,18 @@ namespace RayTracerApp
                                 DefineTransform(name, tempTransform, ref transformValuesList);
                                 break;
                             default:
-                                throw new System.Exception($"Unknown items in definition data: ({definitionData.First().Value} : {definitionKey})");
+                                throw new Exception($"Unknown items in definition data: ({definitionData.First().Value} : {definitionKey})");
                         }
                         break;
                     default:
-                        throw new System.Exception($"Unknown items in definition data: ({definitionKey} : {definitionValue})");
+                        throw new Exception($"Unknown items in definition data: ({definitionKey} : {definitionValue})");
                 }
             }
         }
 
         private void DefineTransform(string name, IEnumerable<object> tempTransform, ref List<object> transformValuesList)
         {
-            foreach (var item in tempTransform)
-            {
-                transformValuesList.Add(item);
-                // var itemStr = item.ToString() ?? "";
-                // if (_transformDefinitions.ContainsKey(itemStr))
-                // {
-                //     transformValuesList.AddRange(_transformDefinitions[itemStr]);
-                // }
-                // else
-                // {
-                //     transformValuesList.Add(item);
-                // }
-            }                        
+            transformValuesList.AddRange(tempTransform);
             _transformDefinitions.Add(name, transformValuesList);
         }
 
@@ -250,12 +255,12 @@ namespace RayTracerApp
             else if (_transformDefinitions.ContainsKey(itemString))
                 transformValuesList.AddRange(_transformDefinitions[name]);
             else
-                throw new System.Exception($"Unknown items in definition data: ({definitionKey} : {definitionValue})");
+                throw new Exception($"Unknown items in definition data: ({definitionKey} : {definitionValue})");
         }
 
         private void ProcessWorldObject(World world, Dictionary<string, object> item)
         {
-            System.Console.WriteLine($"Adding: {item.Values.First()}");
+            Console.WriteLine($"Adding: {item.Values.First()}");
 
             switch (item.Values.First())
             {
@@ -302,7 +307,7 @@ namespace RayTracerApp
                 return _groupDefinitions[shapeName].Clone();
             }
 
-            throw new System.Exception($"Unknown Shape type in YAML file: {shapeName}");
+            throw new Exception($"Unknown Shape type in YAML file: {shapeName}");
         }
 
         private Shape ProcessShape(IReadOnlyList<KeyValuePair<string, object>> shapeData)
@@ -348,7 +353,7 @@ namespace RayTracerApp
                                 cone.Minimum = ExtractDouble(shapeValue.ToString(), "Cone minimum");
                                 break;
                             default:
-                                throw new System.Exception($"Unknown shape type with minimum attribute: {shapeObject.GetType().Name}");
+                                throw new Exception($"Unknown shape type with minimum attribute: {shapeObject.GetType().Name}");
                         }
                         break;
                     case "maximum":
@@ -361,7 +366,7 @@ namespace RayTracerApp
                                 cone.Maximum = ExtractDouble(shapeValue.ToString(), "Cone maximum");
                                 break;
                             default:
-                                throw new System.Exception($"Unknown shape type with maximum attribute: {shapeObject.GetType().Name}");
+                                throw new Exception($"Unknown shape type with maximum attribute: {shapeObject.GetType().Name}");
                         }
                         break;
                     case "closed":
@@ -374,7 +379,7 @@ namespace RayTracerApp
                                 cone.Closed = ExtractBoolean(shapeValue.ToString(), "Cone closed");
                                 break;
                             default:
-                                throw new System.Exception($"Unknown shape type with closed attribute: {shapeObject.GetType().Name}");
+                                throw new Exception($"Unknown shape type with closed attribute: {shapeObject.GetType().Name}");
                         }
                         break;
                     case "vertices":
@@ -423,7 +428,7 @@ namespace RayTracerApp
                         break;
                     }
                     default:
-                        throw new System.Exception($"Unknown attribute in shape data: ({shapeKey}: {shapeValue})");
+                        throw new Exception($"Unknown attribute in shape data: ({shapeKey}: {shapeValue})");
                 }
             }
             return shapeObject;
@@ -493,7 +498,7 @@ namespace RayTracerApp
         {
             if (patternData is not Dictionary<object, object> patternInstructions)
             {
-                throw new System.Exception($"Unknown type(s) in pattern data {patternData}");
+                throw new Exception($"Unknown type(s) in pattern data {patternData}");
             }
 
             Pattern pattern = null;
@@ -517,7 +522,7 @@ namespace RayTracerApp
                         {
                             if (patternInstructions[instruction] is not Dictionary<object, object> subPatterns)
                             {
-                                throw new System.Exception("Invalid sub-pattern data format");
+                                throw new Exception("Invalid sub-pattern data format");
                             }
                             nestedPattern.PatternA = ProcessPattern(subPatterns["pattern-a"]);
                             nestedPattern.PatternB = ProcessPattern(subPatterns["pattern-b"]);
@@ -527,21 +532,21 @@ namespace RayTracerApp
                         {
                             if (patternInstructions[instruction] is not Dictionary<object, object> subPatterns)
                             {
-                                throw new System.Exception("Invalid sub-pattern data format");
+                                throw new Exception("Invalid sub-pattern data format");
                             }
                             blendedPattern.PatternA = ProcessPattern(subPatterns["pattern-a"]);
                             blendedPattern.PatternB = ProcessPattern(subPatterns["pattern-b"]);
                             break;
                         }
                         default:
-                            throw new System.Exception("Invalid compound pattern type");
+                            throw new Exception("Invalid compound pattern type");
                     }
                 }
                 else if (instruction.Contains("transform"))
                 {
                     if (patternInstructions[instruction] is not List<object> transform)
                     {
-                        throw new System.Exception("Invalid transform format in pattern data");
+                        throw new Exception("Invalid transform format in pattern data");
                     }
 
                     if (pattern != null)
@@ -563,8 +568,45 @@ namespace RayTracerApp
                             "cylindrical" => UvPatternMapType.Cylindrical,
                             "planar" => UvPatternMapType.Planar,
                             "cubic" => UvPatternMapType.Cubic,
-                            _ => throw new System.Exception($"Unknown UV Mapping Type: {patternInstructions[instruction]}")
+                            _ => throw new Exception($"Unknown UV Mapping Type: {patternInstructions[instruction]}")
                         };
+                    }
+                }
+                else if (instruction.Contains("left") || instruction.Contains("right") || instruction.Contains("front") || instruction.Contains("back") || instruction.Contains("upper") || instruction.Contains("lower"))
+                {
+                    if (pattern is not UvCubeMap)
+                        pattern = new UvCubeMap();
+
+                    // if (pattern is not UvCubeMap uvCube)
+                    //     pattern = new UvCubeMap();
+
+                    if (patternInstructions[instruction] is Dictionary<object, object> uvPatternData)
+                        switch (instruction)
+                        {
+                            case "left":
+                                ((UvCubeMap)pattern).LeftFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                break;
+                            case "right":
+                                ((UvCubeMap)pattern).RightFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                break;
+                            case "front":
+                                ((UvCubeMap)pattern).FrontFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                break;
+                            case "back":
+                                ((UvCubeMap)pattern).BackFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                break;
+                            case "upper":
+                                ((UvCubeMap)pattern).UpperFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                break;
+                            case "lower":
+                                ((UvCubeMap)pattern).LowerFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                break;
+                            default:
+                                throw new Exception($"Unknown type(s) in cube map data {patternInstructions[instruction]}");
+                        }
+                    else
+                    {
+                        throw new Exception($"Unknown type(s) in cube map data {patternInstructions[instruction]}");
                     }
                 }
                 else if (instruction.Contains("uv-pattern"))
@@ -572,7 +614,7 @@ namespace RayTracerApp
                     if (patternInstructions[instruction] is Dictionary<object, object> uvPatternData)
                         pattern = ProcessUvPatternData(((UvPattern)pattern).UvPatternMapType, uvPatternData);
                     else
-                        throw new System.Exception($"Unknown type(s) in UV pattern data {patternInstructions[instruction]}");
+                        throw new Exception($"Unknown type(s) in UV pattern data {patternInstructions[instruction]}");
                 }
             }
 
@@ -586,7 +628,7 @@ namespace RayTracerApp
                 if (patternInstructions[instruction] is Dictionary<object, object> colourDict)
                     colours = colourDict.Values.ToList();
                 else
-                    throw new System.Exception("Invalid colour data format");
+                    throw new Exception("Invalid colour data format");
             }
 
             var colourList = new List<Colour>();
@@ -655,7 +697,7 @@ namespace RayTracerApp
             {
                 "checker" => new UvCheckerPattern(1, 1, Colour.BLACK, Colour.WHITE),
                 "align-check" => new AlignCheckPattern(Colour.BLACK, Colour.WHITE, Colour.WHITE, Colour.WHITE, Colour.WHITE),
-                _ => throw new System.Exception($"Unknown Pattern type {patternType}")
+                _ => throw new Exception($"Unknown Pattern type {patternType}")
             };
         }
 
@@ -674,7 +716,7 @@ namespace RayTracerApp
                 "ring" => new RingPattern(Colour.BLACK, Colour.WHITE),
                 "stripe" => new StripePattern(Colour.BLACK, Colour.WHITE),
                 "map" => new UvPattern(Colour.BLACK, Colour.WHITE),
-                _ => throw new System.Exception($"Unknown Pattern type {patternType}")
+                _ => throw new Exception($"Unknown Pattern type {patternType}")
             };
         }
 
@@ -728,7 +770,7 @@ namespace RayTracerApp
                     }
                     else
                     {
-                        throw new System.Exception("Unknown transform type in transform data: {instruction}");
+                        throw new Exception("Unknown transform type in transform data: {instruction}");
                     }
                 }
             }
@@ -754,7 +796,7 @@ namespace RayTracerApp
                 }
                 else
                 {
-                    throw new System.Exception("Unknown light attribute in YAML file: {lightKey}");
+                    throw new Exception("Unknown light attribute in YAML file: {lightKey}");
                 }
             }
             return new Light(lightPosition, lightIntensity);
@@ -768,7 +810,7 @@ namespace RayTracerApp
             var from = new Point();
             var to = new Point();
             var up = new Vector();
-            System.Console.WriteLine("Adding: Camera");
+            Console.WriteLine("Adding: Camera");
 
             foreach (var (cameraKey, cameraValue) in objData)
             {
@@ -814,7 +856,7 @@ namespace RayTracerApp
                 }
                 else
                 {
-                    throw new System.Exception($"Unknown camera attribute: {cameraKey}");
+                    throw new Exception($"Unknown camera attribute: {cameraKey}");
                 }
             }
 
@@ -831,9 +873,9 @@ namespace RayTracerApp
             {
                 return (from coord in (IEnumerable<object>) tupleToConvert select ExtractDouble(coord.ToString(), description)).ToList();
             }
-            catch (System.Exception)
+            catch (Exception)
             {
-                throw new System.FormatException($"Could not convert {tupleToConvert} into an integer for {description}");
+                throw new FormatException($"Could not convert {tupleToConvert} into an integer for {description}");
             }
         }
 
@@ -841,21 +883,21 @@ namespace RayTracerApp
         {
             if (bool.TryParse(valueToConvert, out var result))
                 return result;
-            throw new System.FormatException($"Could not convert {valueToConvert} into a boolean for {description}");
+            throw new FormatException($"Could not convert {valueToConvert} into a boolean for {description}");
         }
 
         private static int ExtractInteger(string valueToConvert, string description)
         {
             if (int.TryParse(valueToConvert, out var result))
                 return result;
-            throw new System.FormatException($"Could not convert {valueToConvert} into an integer for {description}");
+            throw new FormatException($"Could not convert {valueToConvert} into an integer for {description}");
         }
 
         private static double ExtractDouble(string valueToConvert, string description)
         {
             if (double.TryParse(valueToConvert, out var result))
                 return result;
-            throw new System.FormatException($"Could not convert {valueToConvert} into a double for {description}");
+            throw new FormatException($"Could not convert {valueToConvert} into a double for {description}");
         }
     }
 }

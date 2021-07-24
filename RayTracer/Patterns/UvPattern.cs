@@ -39,7 +39,6 @@ namespace RayTracer
                 UvPatternMapType.Spherical => UvPatternMaps.UvSphericalMapping(p),
                 UvPatternMapType.Planar => UvPatternMaps.UvPlanarMapping(p),
                 UvPatternMapType.Cylindrical => UvPatternMaps.UvCylindricalMapping(p),
-                UvPatternMapType.Cubic => UvPatternMaps.UvCubicMapping(p),
                 _ => throw new InvalidOperationException($"Unrecognised UV Mapping Type: {UvPatternMapType}")
             };
         }

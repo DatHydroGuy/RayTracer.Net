@@ -46,8 +46,8 @@ namespace RayTracer
                 Parent = Parent,
                 Transform = Transform.Clone()
             };
-            groupClone.AddChildren(Shapes.Select(shape => shape.Clone()));
             groupClone.SetMaterial(Material.Clone());
+            groupClone.AddChildren(Shapes.Select(shape => shape.Clone()));
             return groupClone;
         }
 
