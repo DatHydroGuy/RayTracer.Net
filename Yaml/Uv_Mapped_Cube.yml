@@ -1,0 +1,147 @@
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Uv_Mapped_Cube_YAML.ppm
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 800
+  height: 400
+  field-of-view: 0.8
+  from: [0, 0, -20]
+  to: [0, 0, 0]
+  up: [0, 1, 0]
+  show-progress: true
+  antialias-level: 5
+
+# ======================================================
+# the lights
+# ======================================================
+
+- add: light
+  at: [0, 100, -100]
+  intensity: [0.25, 0.25, 0.25]
+- add: light
+  at: [0, -100, -100]
+  intensity: [0.25, 0.25, 0.25]
+- add: light
+  at: [-100, 0, -100]
+  intensity: [0.25, 0.25, 0.25]
+- add: light
+  at: [100, 0, -100]
+  intensity: [0.25, 0.25, 0.25]
+
+# ======================================================
+# the scene
+# ======================================================
+
+- define: MappedCube
+  value:
+    add: cube
+    material:
+      pattern:
+        type: map
+        mapping: cubic
+        left:
+          type: align-check
+          colours:
+            main: [1, 1, 0] # yellow
+            upper-left: [0, 1, 1]   # cyan
+            upper-right: [1, 0, 0]   # red
+            lower-left: [0, 0, 1]   # blue
+            lower-right: [1, 0.5, 0] # brown
+        front:
+          type: align-check
+          colours:
+            main: [0, 1, 1] # cyan
+            upper-left: [1, 0, 0]   # red
+            upper-right: [1, 1, 0]   # yellow
+            lower-left: [1, 0.5, 0] # brown
+            lower-right: [0, 1, 0]   # green
+        right:
+          type: align-check
+          colours:
+            main: [1, 0, 0] # red
+            upper-left: [1, 1, 0]   # yellow
+            upper-right: [1, 0, 1]   # purple
+            lower-left: [0, 1, 0]   # green
+            lower-right: [1, 1, 1]   # white
+        back:
+          type: align-check
+          colours:
+            main: [0, 1, 0] # green
+            upper-left: [1, 0, 1]   # purple
+            upper-right: [0, 1, 1]   # cyan
+            lower-left: [1, 1, 1]   # white
+            lower-right: [0, 0, 1]   # blue
+        upper:
+          type: align-check
+          colours:
+            main: [1, 0.5, 0] # brown
+            upper-left: [0, 1, 1]   # cyan
+            upper-right: [1, 0, 1]   # purple
+            lower-left: [1, 0, 0]   # red
+            lower-right: [1, 1, 0]   # yellow
+        lower:
+          type: align-check
+          colours:
+            main: [1, 0, 1] # purple
+            upper-left: [1, 0.5, 0] # brown
+            upper-right: [0, 1, 0]   # green
+            lower-left: [0, 0, 1]   # blue
+            lower-right: [1, 1, 1]   # white
+      ambient: 0.2
+      specular: 0
+      diffuse: 0.8
+
+- add: MappedCube
+  transform:
+    - [rotate-y, 0.7854]
+    - [rotate-x, 0.7854]
+    - [translate, -6, 2, 0]
+
+- add: MappedCube
+  transform:
+    - [rotate-y, 2.3562]
+    - [rotate-x, 0.7854]
+    - [translate, -2, 2, 0]
+
+- add: MappedCube
+  transform:
+    - [rotate-y, 3.927]
+    - [rotate-x, 0.7854]
+    - [translate, 2, 2, 0]
+
+- add: MappedCube
+  transform:
+    - [rotate-y, 5.4978]
+    - [rotate-x, 0.7854]
+    - [translate, 6, 2, 0]
+
+- add: MappedCube
+  transform:
+    - [rotate-y, 0.7854]
+    - [rotate-x, -0.7854]
+    - [translate, -6, -2, 0]
+
+- add: MappedCube
+  transform:
+    - [rotate-y, 2.3562]
+    - [rotate-x, -0.7854]
+    - [translate, -2, -2, 0]
+
+- add: MappedCube
+  transform:
+    - [rotate-y, 3.927]
+    - [rotate-x, -0.7854]
+    - [translate, 2, -2, 0]
+
+- add: MappedCube
+  transform:
+    - [rotate-y, 5.4978]
+    - [rotate-x, -0.7854]
+    - [translate, 6, -2, 0]

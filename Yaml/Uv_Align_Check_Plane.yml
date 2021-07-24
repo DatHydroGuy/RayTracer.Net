@@ -1,0 +1,56 @@
+# ======================================================
+# Chapter07.yml
+#
+# This file reconstructs the final image of Chapter07
+# from the book "The Ray Tracer Challenge" by Jamis Buck
+# ======================================================
+
+# ======================================================
+# output filename
+# ======================================================
+
+- file: Images\Uv_Align_Check_Plane_YAML.ppm
+
+# ======================================================
+# the camera
+# ======================================================
+
+- add: camera
+  width: 800
+  height: 800
+  field-of-view: 0.5
+  from: [1, 2, -5]
+  to: [0, 0, 0]
+  up: [0, 1, 0]
+  show-progress: true
+  antialias-level: 5
+
+# ======================================================
+# the light
+# ======================================================
+
+- add: light
+  at: [-10, 10, -10]
+  intensity: [1, 1, 1]
+
+# ======================================================
+# the scene
+# ======================================================
+
+- add: plane
+  material:
+    pattern:
+      type: map
+      mapping: planar
+      uv-pattern:
+        type: align-check
+        colors:
+          main: [1, 1, 1] # white
+          ul: [1, 0, 0]   # red
+          ur: [1, 1, 0]   # yellow
+          bl: [0, 1, 0]   # green
+          br: [0, 1, 1]   # cyan
+    ambient: 0.1
+    specular: 0
+    shininess: 10
+    diffuse: 0.8
