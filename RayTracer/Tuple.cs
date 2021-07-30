@@ -52,9 +52,9 @@ namespace RayTracer
         public static bool operator==(Tuple t1, Tuple t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
+            if(ReferenceEquals(t1, null))
             {
-                return object.ReferenceEquals(t2, null);
+                return ReferenceEquals(t2, null);
             }
 
             return t1.Equals(t2);

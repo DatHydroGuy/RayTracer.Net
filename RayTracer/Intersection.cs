@@ -89,7 +89,7 @@ namespace RayTracer
 
             foreach (var intersection in allIntersections)
             {
-                if(Utilities.AlmostEqual(intersection.T, this.T))
+                if(Utilities.AlmostEqual(intersection.T, T))
                 {
                     if(containers.Count > 0)
                     {
@@ -106,7 +106,7 @@ namespace RayTracer
                     containers.Add(intersection.Obj);
                 }
 
-                if(Utilities.AlmostEqual(intersection.T, this.T))
+                if(Utilities.AlmostEqual(intersection.T, T))
                 {
                     if(containers.Count > 0)
                     {

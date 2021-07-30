@@ -240,7 +240,7 @@ namespace RayTracer
 
             var D = p * p - q;
 
-            if(Utilities.AlmostEqual(D, 0))
+            if(AlmostEqual(D, 0))
             {
                 return new double[] {-p, -p};
             }
@@ -275,9 +275,9 @@ namespace RayTracer
             var D = q * q + pCubed;
             var s = new List<double>();
 
-            if(Utilities.AlmostEqual(D, 0))
+            if(AlmostEqual(D, 0))
             {
-                if(Utilities.AlmostEqual(q, 0))
+                if(AlmostEqual(q, 0))
                 {
                     // There is one single, triple solution
                     s.Add(0);
@@ -339,16 +339,16 @@ namespace RayTracer
             var r = -3.0 / 256.0 * aSquared * aSquared + 1.0 / 16.0 * aSquared * B - 1.0 / 4.0 * A * C + D;
             var s = new List<double>();
 
-            if (Utilities.AlmostEqual(r, 0))
+            if (AlmostEqual(r, 0))
             {
                 // There is no absolute term: y(y^3 + py + q) = 0
-                s.AddRange(Utilities.Solve3(1, 0, p, q));
+                s.AddRange(Solve3(1, 0, p, q));
                 s.Add(0);
             }
             else
             {
                 // Solve resolvent cubic equation
-                var cubicSolns = Utilities.Solve3(1, -1.0 / 2.0 * p, -r, 1.0 / 2.0 * r * p - 1.0 / 8.0 * q * q);
+                var cubicSolns = Solve3(1, -1.0 / 2.0 * p, -r, 1.0 / 2.0 * r * p - 1.0 / 8.0 * q * q);
 
                 // Take the single real solution...
                 var z = cubicSolns[0];
@@ -357,7 +357,7 @@ namespace RayTracer
                 var u = z * z - r;
                 var v = 2.0 * z - p;
 
-                if (Utilities.AlmostEqual(u, 0))
+                if (AlmostEqual(u, 0))
                 {
                     u = 0.0;
                 }
@@ -371,7 +371,7 @@ namespace RayTracer
                     return new double[] {};
                 }
 
-                if (Utilities.AlmostEqual(v, 0))
+                if (AlmostEqual(v, 0))
                 {
                     v = 0.0;
                 }
@@ -386,10 +386,10 @@ namespace RayTracer
                 }
 
                 // Solve first quadratic equation
-                s.AddRange(Utilities.Solve2(1, q < 0 ? -v : v, z - u));
+                s.AddRange(Solve2(1, q < 0 ? -v : v, z - u));
 
                 // Solve second quadratic equation
-                s.AddRange(Utilities.Solve2(1, q < 0 ? v : -v, z + u));
+                s.AddRange(Solve2(1, q < 0 ? v : -v, z + u));
             }
 
             // Resubstitute values back in

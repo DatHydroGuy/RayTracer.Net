@@ -98,12 +98,12 @@ namespace RayTracer
         public static bool operator==(Matrix t1, Matrix t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
+            if(ReferenceEquals(t1, null))
             {
-                return object.ReferenceEquals(t2, null);
+                return ReferenceEquals(t2, null);
             }
 
-            if(object.ReferenceEquals(t2, null))
+            if(ReferenceEquals(t2, null))
             {
                 return false;
             }

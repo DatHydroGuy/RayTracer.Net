@@ -66,13 +66,64 @@ namespace RayTracer
             writer.WriteImageFile(imageFileName);
         }
 
-        public Colour[,] CanvasFromPpm(string fileContents)
+        public static Canvas CanvasFromPpm(string fileContents)
         {
+            fileContents = RemoveCommentLines(fileContents);
             using var sr = new StringReader(fileContents);
             var header = sr.ReadLine();
             if (header != "P3")
                 throw new Exception($"Incorrect PPM file header in line 0: {header}");
-            return new[,] { { Colour.RED } };
+            var dimensions = sr.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            if (!int.TryParse(dimensions?[0], out var width))
+                throw new Exception($"Cannot parse canvas width: {dimensions?[0]}");
+            if (!int.TryParse(dimensions?[1], out var height))
+                throw new Exception($"Cannot parse canvas height: {dimensions?[1]}");
+            var colourMaxStr = sr.ReadLine();
+            if (!double.TryParse(colourMaxStr, out var colourMax))
+                throw new Exception($"Cannot parse maximum colour value: {colourMaxStr}");
+            var canvas = new Canvas(width, height);
+            var pixelRow = new string[width * 3];
+            for (var y = 0; y < height; y++)
+            {
+                var offset = 0;
+                while (offset < width * 3)
+                {
+                    var row = sr.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                    if (row == null)
+                        throw new Exception($"Cannot parse colour values at column {y}, row {offset}");
+                    Array.Copy(row, 0, pixelRow, offset, row.Length);
+                    offset += row.Length;
+                }
+                for (var x = 0; x < width; x++)
+                {
+                    if (!int.TryParse(pixelRow?[x * 3], out var red))
+                        throw new Exception($"Cannot parse red colour value: {pixelRow?[x * 3]} at column {y}, row {x}");
+                    if (!int.TryParse(pixelRow?[x * 3 + 1], out var green))
+                        throw new Exception($"Cannot parse green colour value: {pixelRow?[x * 3 + 1]} at column {y}, row {x}");
+                    if (!int.TryParse(pixelRow?[x * 3 + 2], out var blue))
+                        throw new Exception($"Cannot parse blue colour value: {pixelRow?[x * 3 + 2]} at column {y}, row {x}");
+                    canvas.Pixels[y, x] = new Colour(red / colourMax, green / colourMax, blue / colourMax);
+                }
+            }
+            return canvas;
+        }
+
+        private static string RemoveCommentLines(string fileContents)
+        {
+            if (fileContents.StartsWith("#"))
+            {
+                var firstReturn = fileContents.IndexOf("\r\n", StringComparison.Ordinal);
+                fileContents = fileContents[(firstReturn + 1)..];
+            }
+
+            while (fileContents.Contains("\r\n#"))
+            {
+                var firstReturn = fileContents.IndexOf("\r\n#", StringComparison.Ordinal);
+                var nextReturn = fileContents.IndexOf("\r\n", firstReturn + 1, StringComparison.Ordinal);
+                fileContents = fileContents[..firstReturn] + fileContents[nextReturn..];
+            }
+
+            return fileContents;
         }
     }
 }

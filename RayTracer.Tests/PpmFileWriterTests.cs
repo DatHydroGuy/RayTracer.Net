@@ -103,16 +103,5 @@ namespace RayTracer.Tests
             // Assert
             Assert.EndsWith(expected, result);
         }
-
-        [Fact]
-        public void ReadingAPpmFileWithTheWrongMagicNumber()
-        {
-            // Arrange
-            var c = new Canvas(1, 1);
-            const string fileContents = "P32\r\n1 1\r\n255\r\n0 0 0\r\n";
-
-            // Act & Assert
-            Assert.Throws<Exception>(() => c.CanvasFromPpm(fileContents));
-        }
     }
 }

@@ -48,12 +48,7 @@ namespace RayTracer
         public static bool operator==(Colour t1, Colour t2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(t1, null))
-            {
-                return object.ReferenceEquals(t2, null);
-            }
-
-            return t1.Equals(t2);
+            return t1?.Equals(t2) ?? ReferenceEquals(t2, null);
         }
 
         public static bool operator!=(Colour t1, Colour t2)

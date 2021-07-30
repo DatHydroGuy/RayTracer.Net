@@ -99,9 +99,9 @@ namespace RayTracer
         public static bool operator==(Material m1, Material m2)
         {
             // If any nulls are passed in, then both arguments must be null for equality
-            if(object.ReferenceEquals(m1, null))
+            if(ReferenceEquals(m1, null))
             {
-                return object.ReferenceEquals(m2, null);
+                return ReferenceEquals(m2, null);
             }
 
             return m1.Equals(m2);

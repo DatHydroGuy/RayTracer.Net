@@ -83,7 +83,7 @@ namespace RayTracer
             orientation.Data[2, 1] = -forward.Y;
             orientation.Data[2, 2] = -forward.Z;
 
-            return orientation * Transformations.Translation(-from.X, -from.Y, -from.Z);
+            return orientation * Translation(-from.X, -from.Y, -from.Z);
         }
     }
 }
