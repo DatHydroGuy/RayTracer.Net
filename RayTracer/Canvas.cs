@@ -112,14 +112,14 @@ namespace RayTracer
         {
             if (fileContents.StartsWith("#"))
             {
-                var firstReturn = fileContents.IndexOf("\r\n", StringComparison.Ordinal);
+                var firstReturn = fileContents.IndexOf("\n", StringComparison.Ordinal);
                 fileContents = fileContents[(firstReturn + 1)..];
             }
 
-            while (fileContents.Contains("\r\n#"))
+            while (fileContents.Contains("\n#"))
             {
-                var firstReturn = fileContents.IndexOf("\r\n#", StringComparison.Ordinal);
-                var nextReturn = fileContents.IndexOf("\r\n", firstReturn + 1, StringComparison.Ordinal);
+                var firstReturn = fileContents.IndexOf("\n#", StringComparison.Ordinal);
+                var nextReturn = fileContents.IndexOf("\n", firstReturn + 1, StringComparison.Ordinal);
                 fileContents = fileContents[..firstReturn] + fileContents[nextReturn..];
             }
 

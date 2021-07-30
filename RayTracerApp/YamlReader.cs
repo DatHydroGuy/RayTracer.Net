@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using RayTracer;
@@ -683,6 +684,16 @@ namespace RayTracerApp
                         continue;
                     uvPattern.Height = ExtractInteger(uvPatternData[instruction].ToString(), "UV pattern height");
                 }
+                else if (instruction.Contains("file"))
+                {
+                    var imageFileName = uvPatternData[instruction].ToString();
+                    var imageFile = File.ReadAllText(Path.Join(_imagesFolder, imageFileName));
+                    var canvas = Canvas.CanvasFromPpm(imageFile);
+                    if (uvPattern is ImagePattern imagePattern)
+                    {
+                        imagePattern.Canvas = canvas;
+                    }
+                }
             }
 
             if (uvPattern is not null)
@@ -697,6 +708,7 @@ namespace RayTracerApp
             {
                 "checker" => new UvCheckerPattern(1, 1, Colour.BLACK, Colour.WHITE),
                 "align-check" => new AlignCheckPattern(Colour.BLACK, Colour.WHITE, Colour.WHITE, Colour.WHITE, Colour.WHITE),
+                "image" => new ImagePattern(null),
                 _ => throw new Exception($"Unknown Pattern type {patternType}")
             };
         }
