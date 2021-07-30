@@ -67,7 +67,7 @@ namespace RayTracerApp
             camera.Transform = Transformations.ViewTransform(new Point(0, 3, -6), new Point(0, 1, 0), new Vector(0, 1, 0));
 
             var canvas = camera.Render(world, 8, 1, true);
-            canvas.WritePpmFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\chapter13ConsCylinders");
+            canvas.WriteImageFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\chapter13ConsCylinders");
             Console.WriteLine("Chapter13ConsCylinders Complete");
         }
     }

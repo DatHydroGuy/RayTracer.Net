@@ -28,7 +28,7 @@ namespace RayTracerApp
             camera.Transform = Transformations.ViewTransform(new Point(0, 4, -6), new Point(0, 1, 0), new Vector(0, 1, 0));
 
             var canvas = camera.Render(world, 1, 1, true);
-            canvas.WritePpmFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\torus_test");
+            canvas.WriteImageFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\torus_test");
             Console.WriteLine("TorusTest Complete");
         }
     }

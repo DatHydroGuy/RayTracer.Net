@@ -44,7 +44,7 @@ namespace RayTracerApp
                 }
             }
 
-            canvas.WritePpmFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\chapter06");
+            canvas.WriteImageFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\chapter06");
             Console.WriteLine("Chapter06 Complete");
         }
     }

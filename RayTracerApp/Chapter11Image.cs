@@ -41,7 +41,7 @@ namespace RayTracerApp
             camera.Transform = Transformations.ViewTransform(new Point(0, 2.5, 0), new Point(0, 0, 0), new Vector(0, 0, 1));
 
             var canvas = camera.Render(world, 5, 8, true);
-            canvas.WritePpmFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\chapter11Image");
+            canvas.WriteImageFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\chapter11Image");
             Console.WriteLine("Chapter11Image Complete");
         }
     }

@@ -82,7 +82,7 @@ namespace RayTracerApp
             // Render the scene
             var canvas = camera.Render(world, reflectionDepth: _renderingDetails["reflectiondepth"],
                                        antialiasLevel: _renderingDetails["antialiaslevel"], showProgress: _renderingDetails["showprogress"] != 0);
-            canvas.WritePpmFile(outFile);
+            canvas.WriteImageFile(outFile);
             Console.WriteLine("Image rendering complete");
         }
 

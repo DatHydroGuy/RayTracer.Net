@@ -34,7 +34,7 @@ namespace RayTracerApp
             camera.Transform = Transformations.ViewTransform(new Point(-0.5, 2.5, -5), new Point(0, 1, 0), new Vector(0, 1, 0));
 
             var canvas = camera.Render(world, 8, 8, true);
-            canvas.WritePpmFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\chapter16CSGHollowSphereCubeAA");
+            canvas.WriteImageFile("I:\\Programming\\DotNetCore\\RayTracer\\RayTracer\\Images\\chapter16CSGHollowSphereCubeAA");
             Console.WriteLine("Chapter16CSGHollowSphereCube Complete");
         }
 
