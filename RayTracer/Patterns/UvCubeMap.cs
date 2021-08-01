@@ -4,18 +4,18 @@ namespace RayTracer
 {
     public class UvCubeMap: UvPattern
     {
-        public AlignCheckPattern LeftFace { get; set; }
-        public AlignCheckPattern RightFace { get; set; }
-        public AlignCheckPattern FrontFace { get; set; }
-        public AlignCheckPattern BackFace { get; set; }
-        public AlignCheckPattern UpperFace { get; set; }
-        public AlignCheckPattern LowerFace { get; set; }
+        public UvPattern LeftFace { get; set; }
+        public UvPattern RightFace { get; set; }
+        public UvPattern FrontFace { get; set; }
+        public UvPattern BackFace { get; set; }
+        public UvPattern UpperFace { get; set; }
+        public UvPattern LowerFace { get; set; }
         
         public UvCubeMap(): base(Colour.BLACK, Colour.WHITE)
         {}
 
-        public UvCubeMap(AlignCheckPattern leftFace, AlignCheckPattern frontFace, AlignCheckPattern rightFace,
-            AlignCheckPattern backFace, AlignCheckPattern upperFace, AlignCheckPattern lowerFace) : this()
+        public UvCubeMap(UvPattern leftFace, UvPattern frontFace, UvPattern rightFace,
+            UvPattern backFace, UvPattern upperFace, UvPattern lowerFace) : this()
         {
             LeftFace = leftFace;
             RightFace = rightFace;

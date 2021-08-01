@@ -43,6 +43,11 @@ namespace RayTracer
             };
         }
 
+        public virtual Colour ColourAtUv(double uValue, double vValue)
+        {
+            throw new NotImplementedException();
+        }
+
         public override UvPattern Clone()
         {
             return new UvPattern(Width, Height, ColourA.Clone(), ColourB.Clone(), UvPatternMapType);

@@ -14,7 +14,7 @@ namespace RayTracer
         public override Colour ColourAtPoint(Point targetPoint)
         {
             var (u, v) = TextureMap(targetPoint);
-            return UvPatternAt(u, v);
+            return ColourAtUv(u, v);
         }
 
         public override ImagePattern Clone()
@@ -27,7 +27,7 @@ namespace RayTracer
             return $"[Canvas:{Canvas}]\n";
         }
         
-        public Colour UvPatternAt(double uValue, double vValue)
+        public override Colour ColourAtUv(double uValue, double vValue)
         {
             // Flip v-axis over so that it matches the y-axis with 0 bottom-most
             var v = 1 - vValue;

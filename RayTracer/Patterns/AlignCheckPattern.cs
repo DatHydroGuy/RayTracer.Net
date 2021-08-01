@@ -24,7 +24,7 @@ namespace RayTracer
             UvPatternMapType = UvPatternMapType.Cubic;
         }
 
-        public Colour ColourAtUv(double u, double v)
+        public override Colour ColourAtUv(double u, double v)
         {
             return v switch
             {

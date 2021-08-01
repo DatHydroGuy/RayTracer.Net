@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace RayTracer
@@ -25,9 +26,9 @@ namespace RayTracer
 
         private static Color ConvertColourToPngFormat(Colour pixel)
         {
-            var red = (int) (pixel.Red * 255);
-            var green = (int) (pixel.Green * 255);
-            var blue = (int) (pixel.Blue * 255);
+            var red = Math.Max(Math.Min((int) (pixel.Red * 255), 255), 0);
+            var green = Math.Max(Math.Min((int) (pixel.Green * 255), 255), 0);
+            var blue = Math.Max(Math.Min((int) (pixel.Blue * 255), 255), 0);
             return Color.FromArgb(red, green, blue);
         }
     }

@@ -30,7 +30,7 @@ namespace RayTracer.Tests
             var pattern = new ImagePattern(canvas);
             for (var i = 0; i < expected.Length; i++)
             {
-                allTestsPass &= pattern.UvPatternAt(uValues[i], vValues[i]) == expected[i];
+                allTestsPass &= pattern.ColourAtUv(uValues[i], vValues[i]) == expected[i];
             }
 
             // Assert

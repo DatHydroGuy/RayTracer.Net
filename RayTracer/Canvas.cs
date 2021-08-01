@@ -82,26 +82,30 @@ namespace RayTracer
             if (!double.TryParse(colourMaxStr, out var colourMax))
                 throw new Exception($"Cannot parse maximum colour value: {colourMaxStr}");
             var canvas = new Canvas(width, height);
-            var pixelRow = new string[width * 3];
+
+            var pixelArray = new string[width * 3 * height];
+            
+            // var pixelRow = new string[width * 3];
+            var offset = 0;
+            while (offset < width * 3 * height)
+            {
+                var row = sr.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                if (row == null)
+                    throw new Exception($"Cannot parse colour values at index {offset}");
+                Array.Copy(row, 0, pixelArray, offset, row.Length);
+                offset += row.Length;
+            }
             for (var y = 0; y < height; y++)
             {
-                var offset = 0;
-                while (offset < width * 3)
-                {
-                    var row = sr.ReadLine()?.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-                    if (row == null)
-                        throw new Exception($"Cannot parse colour values at column {y}, row {offset}");
-                    Array.Copy(row, 0, pixelRow, offset, row.Length);
-                    offset += row.Length;
-                }
                 for (var x = 0; x < width; x++)
                 {
-                    if (!int.TryParse(pixelRow?[x * 3], out var red))
-                        throw new Exception($"Cannot parse red colour value: {pixelRow?[x * 3]} at column {y}, row {x}");
-                    if (!int.TryParse(pixelRow?[x * 3 + 1], out var green))
-                        throw new Exception($"Cannot parse green colour value: {pixelRow?[x * 3 + 1]} at column {y}, row {x}");
-                    if (!int.TryParse(pixelRow?[x * 3 + 2], out var blue))
-                        throw new Exception($"Cannot parse blue colour value: {pixelRow?[x * 3 + 2]} at column {y}, row {x}");
+                    var currIndex = y * width * 3 + x * 3;
+                    if (!int.TryParse(pixelArray?[currIndex], out var red))
+                        throw new Exception($"Cannot parse red colour value: {pixelArray?[currIndex]} at column {y}, row {x}");
+                    if (!int.TryParse(pixelArray?[currIndex + 1], out var green))
+                        throw new Exception($"Cannot parse green colour value: {pixelArray?[currIndex + 1]} at column {y}, row {x}");
+                    if (!int.TryParse(pixelArray?[currIndex + 2], out var blue))
+                        throw new Exception($"Cannot parse blue colour value: {pixelArray?[currIndex + 2]} at column {y}, row {x}");
                     canvas.Pixels[y, x] = new Colour(red / colourMax, green / colourMax, blue / colourMax);
                 }
             }

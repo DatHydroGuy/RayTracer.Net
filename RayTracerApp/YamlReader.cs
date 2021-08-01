@@ -585,22 +585,22 @@ namespace RayTracerApp
                         switch (instruction)
                         {
                             case "left":
-                                ((UvCubeMap)pattern).LeftFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                ((UvCubeMap)pattern).LeftFace = (UvPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
                                 break;
                             case "right":
-                                ((UvCubeMap)pattern).RightFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                ((UvCubeMap)pattern).RightFace = (UvPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
                                 break;
                             case "front":
-                                ((UvCubeMap)pattern).FrontFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                ((UvCubeMap)pattern).FrontFace = (UvPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
                                 break;
                             case "back":
-                                ((UvCubeMap)pattern).BackFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                ((UvCubeMap)pattern).BackFace = (UvPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
                                 break;
                             case "upper":
-                                ((UvCubeMap)pattern).UpperFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                ((UvCubeMap)pattern).UpperFace = (UvPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
                                 break;
                             case "lower":
-                                ((UvCubeMap)pattern).LowerFace = (AlignCheckPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
+                                ((UvCubeMap)pattern).LowerFace = (UvPattern)ProcessUvPatternData(UvPatternMapType.Cubic, uvPatternData);
                                 break;
                             default:
                                 throw new Exception($"Unknown type(s) in cube map data {patternInstructions[instruction]}");

@@ -149,6 +149,24 @@ namespace RayTracer.Tests
         }
 
         [Fact]
+        public void PpmParsingAllowsRgbTriplesToHaveDifferentLayoutToCanvasPixels()
+        {
+            // Arrange
+            const string fileContents = "P3\r\n3 2\r\n255\r\n51 153 204  255 127 0  51 153 204  255\r\n127 0  51 153 204  255 127 0\r\n";
+
+            // Act
+            var c = Canvas.CanvasFromPpm(fileContents);
+            
+            // Assert
+            Assert.Equal(new Colour(0.2, 0.6, 0.8), c.Pixels[0, 0]);
+            Assert.Equal(new Colour(1, 0.49804, 0), c.Pixels[0, 1]);
+            Assert.Equal(new Colour(0.2, 0.6, 0.8), c.Pixels[0, 2]);
+            Assert.Equal(new Colour(1, 0.49804, 0), c.Pixels[1, 0]);
+            Assert.Equal(new Colour(0.2, 0.6, 0.8), c.Pixels[1, 1]);
+            Assert.Equal(new Colour(1, 0.49804, 0), c.Pixels[1, 2]);
+        }
+
+        [Fact]
         public void PpmParsingRespectsTheScaleSetting()
         {
             // Arrange
